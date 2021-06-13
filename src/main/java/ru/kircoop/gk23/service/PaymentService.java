@@ -1,13 +1,14 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.dao.PaymentDAO;
-import com.cooperate.entity.Contribution;
-import com.cooperate.entity.Garag;
-import com.cooperate.entity.Payment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kircoop.gk23.dao.PaymentDAO;
+import ru.kircoop.gk23.entity.Contribution;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class PaymentService {
      */
     @Transactional
     public Payment saveOrUpdate(Payment payment) {
-        return paymentDAO.save(payment);
+        return paymentDAO.saveAndFlush(payment);
     }
 
     /**
@@ -60,7 +61,7 @@ public class PaymentService {
      * @return платеж
      */
     public Payment getPayment(Integer id) {
-        return paymentDAO.getOne(id);
+        return paymentDAO.getById(id);
     }
 
     /**
@@ -70,7 +71,7 @@ public class PaymentService {
      */
     @Transactional
     public void delete(Integer id) {
-        paymentDAO.delete(id);
+        paymentDAO.deleteById(id);
     }
 
     /**
@@ -136,12 +137,11 @@ public class PaymentService {
      * @param garag   гараж
      */
     private void setHeaderPay(Payment payment, Garag garag) {
-        Calendar now = Calendar.getInstance();
         if (payment.getDatePayment() == null) {
-            payment.setDatePayment(now);
-            payment.setYear(now.get(Calendar.YEAR));
+            payment.setDatePayment(LocalDateTime.now());
+            payment.setYear(LocalDateTime.now().getYear());
         } else {
-            payment.setYear(payment.getDatePayment().get(Calendar.YEAR));
+            payment.setYear(payment.getDatePayment().getYear());
         }
         //Назначили номер платежа
         payment.setNumber(getMaxNumber());
@@ -157,7 +157,7 @@ public class PaymentService {
      */
     private Payment addingPay(Payment payment) {
         payment.setAdditionallyPay(payment.getPay());
-        payment.setPay(0f);
+        payment.setPay(0);
         payment.setDebtPastPay(garagService.sumContribution(payment.getGarag()));
         return paymentDAO.save(payment);
     }
@@ -168,7 +168,7 @@ public class PaymentService {
      * @param payment Платеж
      */
     private void distributionOldContribute(Payment payment) {
-        float oldContribute = payment.getGarag().getOldContribute();
+        int oldContribute = payment.getGarag().getOldContribute();
         Garag garag = payment.getGarag();
         if (oldContribute != 0) {
             if (payment.getPay() <= oldContribute) {
@@ -178,7 +178,7 @@ public class PaymentService {
             } else {
                 payment.setOldContributePay(oldContribute);
                 payment.setPay(payment.getPay() - oldContribute);
-                garag.setOldContribute(0f);
+                garag.setOldContribute(0);
             }
         }
     }
@@ -190,13 +190,13 @@ public class PaymentService {
      * @param c       период
      */
     private void moreDebts(Payment payment, Contribution c) {
-        Float reminder = c.getSumFixed();
+        Integer reminder = c.getSumFixed();
         payment.setContributePay(payment.getContributePay() + c.getContribute());
-        c.setContribute(0f);
+        c.setContribute(0);
         payment.setContLandPay(payment.getContLandPay() + c.getContLand());
-        c.setContLand(0f);
+        c.setContLand(0);
         payment.setContTargetPay(payment.getContTargetPay() + c.getContTarget());
-        c.setContTarget(0f);
+        c.setContTarget(0);
         c.setFinesOn(false);
         payment.setPay(payment.getPay() - reminder);
         //Если взнос уплачен проверяем оплату по пеням.
@@ -206,8 +206,8 @@ public class PaymentService {
                 payment.setPay(payment.getPay() - c.getFines());
                 c.setFines(0);
             } else {
-                payment.setFinesPay(payment.getFinesPay() + Math.round(payment.getPay()));
-                c.setFines(c.getFines() - Math.round(payment.getPay()));
+                payment.setFinesPay(payment.getFinesPay() + payment.getPay());
+                c.setFines(c.getFines() - payment.getPay());
                 payment.setPay(0);
             }
         }
@@ -227,7 +227,7 @@ public class PaymentService {
         } else {
             payment.setPay(payment.getPay() - c.getContribute());
             payment.setContributePay(payment.getContributePay() + c.getContribute());
-            c.setContribute(0f);
+            c.setContribute(0);
         }
         if (c.getContLand() > payment.getPay()) {
             payment.setContLandPay(payment.getContLandPay() + payment.getPay());
@@ -236,7 +236,7 @@ public class PaymentService {
         } else {
             payment.setPay(payment.getPay() - c.getContLand());
             payment.setContLandPay(payment.getContLandPay() + c.getContLand());
-            c.setContLand(0f);
+            c.setContLand(0);
         }
         if (c.getContTarget() > payment.getPay()) {
             payment.setContTargetPay(payment.getContTargetPay() + payment.getPay());

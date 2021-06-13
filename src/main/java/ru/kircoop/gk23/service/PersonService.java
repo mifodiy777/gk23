@@ -1,10 +1,10 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.dao.PersonDAO;
-import com.cooperate.entity.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kircoop.gk23.dao.PersonDAO;
+import ru.kircoop.gk23.entity.Person;
 
 import java.util.List;
 
@@ -19,25 +19,28 @@ public class PersonService {
 
     /**
      * Сохранение владельца
+     *
      * @param person Владелец
      * @return владелец
      */
     @Transactional
     public Person saveOrUpdate(Person person) {
-        return personDAO.save(person);
+        return personDAO.saveAndFlush(person);
     }
 
     /**
      * Удаление владельца
+     *
      * @param id Идентификатор владельца
      */
     @Transactional
     public void delete(Integer id) {
-        personDAO.delete(id);
+        personDAO.deleteById(id);
     }
 
     /**
      * Получение списка владельцев из базы по определенному паттерну или любые 30 владельцев
+     *
      * @param fio Паттерны - часть ФИО
      * @return Список владельцев
      */
@@ -50,6 +53,7 @@ public class PersonService {
 
     /**
      * Получение списка членов правления
+     *
      * @return список членов правления
      */
     public List<Person> getMembers() {
@@ -58,22 +62,23 @@ public class PersonService {
 
     /**
      * Получение владельца по идентификатору
+     *
      * @param id идентификатор владельца
      * @return владелец
      */
     public Person getPerson(Integer id) {
-        return personDAO.findOne(id);
+        return personDAO.findById(id).orElse(null);
     }
 
     /**
      * Получение списка владельце по части ФИО
+     *
      * @param fio часть или полностью ФИО
      * @return Список владельцев
      */
     public List<Person> findByfio(String fio) {
         return personDAO.findByPersonfio(fio);
     }
-
 
 
 }

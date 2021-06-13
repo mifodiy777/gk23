@@ -6,7 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.kircoop.gk23.entity.Payment;
 
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -18,7 +18,7 @@ public interface PaymentDAO extends JpaRepository<Payment, Integer> {
      * @param id Идентификатор гаража
      * @return список платежей
      */
-    @Query("select p from Garag g inner join g.payments p where p.pay <> 0 and g.id = :id ")
+    @Query("select p from Payment p where p.pay <> 0 and p.garag = :id ")
     List<Payment> getPaymentOnGarag(@Param("id") Integer id);
 
     /**
@@ -53,6 +53,17 @@ public interface PaymentDAO extends JpaRepository<Payment, Integer> {
      * @return список платежей
      */
     @Query("select distinct p from Payment p where p.datePayment BETWEEN :start and :end")
-    List<Payment> findByDateBetween(@Param("start") Calendar start, @Param("end") Calendar end);
+    List<Payment> findByDateBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
+
+    /**
+     * Метод возвращает платежи гаражей конкретного ряда
+     *
+     * @param series Ряд гаража
+     * @return список платежей
+     */
+    @Query("select p from Payment p inner join p.garag g where p.pay <> 0 and g.series = :series and p.datePayment BETWEEN :start and :end order by g.number ASC")
+    List<Payment> findPaymentOnSeriesGaragBetweenDate(@Param("series") String series,
+                                                      @Param("start") LocalDate start,
+                                                      @Param("end") LocalDate end);
 
 }

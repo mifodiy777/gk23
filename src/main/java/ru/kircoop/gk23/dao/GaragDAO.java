@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Person;
 
 import java.util.List;
 
@@ -46,6 +47,13 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
      * @return список гаражей
      */
     List<Garag> findBySeries(String series);
+
+    /**
+     * Поиск гаражей по владельцу
+     * @param p владелец
+     * @return
+     */
+    List<Garag> findByPerson(Person p);
 
     /**
      * Нахождение гаражей выбранного ряда c назначенными владельцами

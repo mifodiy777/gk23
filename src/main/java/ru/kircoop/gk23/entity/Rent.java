@@ -14,6 +14,7 @@ public class Rent {
 
     //Год начисления
     @Column(name = "year_rent", nullable = false, unique = true)
+    @OrderBy("yearRent DESC")
     private int yearRent;
 
     //Начисление членского взноса

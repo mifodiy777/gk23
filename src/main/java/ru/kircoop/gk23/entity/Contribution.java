@@ -2,7 +2,7 @@ package ru.kircoop.gk23.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Calendar;
+import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
@@ -54,13 +54,13 @@ public class Contribution implements Serializable {
 
     //Дата последнего обновления пеней
     @Column(name = "fines_last_update")
-    private Calendar finesLastUpdate;
+    private LocalDate finesLastUpdate;
 
     //Льготный ли период
     @Column(name = "benefitsOn")
     private boolean benefitsOn;
 
-   //Член правления в этом периоде
+    //Член правления в этом периоде
     @Column(name = "member_board_on")
     private boolean memberBoardOn;
 
@@ -127,11 +127,11 @@ public class Contribution implements Serializable {
         this.finesOn = finesOn;
     }
 
-    public Calendar getFinesLastUpdate() {
+    public LocalDate getFinesLastUpdate() {
         return finesLastUpdate;
     }
 
-    public void setFinesLastUpdate(Calendar finesLastUpdate) {
+    public void setFinesLastUpdate(LocalDate finesLastUpdate) {
         this.finesLastUpdate = finesLastUpdate;
     }
 

@@ -2,9 +2,10 @@ package ru.kircoop.gk23.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Objects;
+
+import static ru.kircoop.gk23.utils.DateUtils.DD_MM_YYYY_DOT;
 
 /*Класс платежа*/
 @Entity
@@ -15,6 +16,10 @@ public class Payment implements Serializable {
     @Column(name = "id_payment", nullable = false)
     private Integer id;
 
+    @ManyToOne
+    @JoinColumn(name = "id_garag")
+    private Garag garag;
+
     //Номер платежа
     @Column(name = "number_payment", nullable = false, unique = true)
     private Integer number;
@@ -24,7 +29,8 @@ public class Payment implements Serializable {
 
     /*Дата платежа*/
     @Column(name = "date_payment", nullable = false)
-    private Calendar datePayment;
+    @OrderBy("datePayment DESC")
+    private LocalDateTime datePayment;
 
     //ФИО платильщика
     @Column(name = "person_fio", nullable = false)
@@ -81,6 +87,14 @@ public class Payment implements Serializable {
         this.number = number;
     }
 
+    public Garag getGarag() {
+        return garag;
+    }
+
+    public void setGarag(Garag garag) {
+        this.garag = garag;
+    }
+
     public Integer getYear() {
         return year;
     }
@@ -89,17 +103,16 @@ public class Payment implements Serializable {
         this.year = year;
     }
 
-    public Calendar getDatePayment() {
+    public LocalDateTime getDatePayment() {
         return datePayment;
     }
 
-    public void setDatePayment(Calendar datePayment) {
+    public void setDatePayment(LocalDateTime datePayment) {
         this.datePayment = datePayment;
     }
 
     public String getDatePay() {
-        SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
-        return fmt.format(this.datePayment.getTime());
+        return datePayment.format(DD_MM_YYYY_DOT);
     }
 
     public String getFio() {

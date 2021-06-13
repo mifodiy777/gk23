@@ -1,14 +1,13 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.dao.RentDAO;
-import com.cooperate.entity.Contribution;
-import com.cooperate.entity.Garag;
-import com.cooperate.entity.Payment;
-import com.cooperate.entity.Rent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kircoop.gk23.dao.RentDAO;
+import ru.kircoop.gk23.entity.Contribution;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
+import ru.kircoop.gk23.entity.Rent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,17 +26,19 @@ public class RentService {
 
     /**
      * Сохранение периода начислений
+     *
      * @param rent период начислений
      */
     @Transactional
     public void saveOrUpdate(Rent rent) {
-        rentDAO.save(rent);
+        rentDAO.saveAndFlush(rent);
     }
 
     //Существует ли период начислений
 
     /**
      * Проверка существования периода определенного года
+     *
      * @param year год
      * @return true если не существует
      */
@@ -47,6 +48,7 @@ public class RentService {
 
     /**
      * Получение всех периодов начисления
+     *
      * @return список периодов
      */
     public List<Rent> getRents() {
@@ -55,6 +57,7 @@ public class RentService {
 
     /**
      * Создание нового периода
+     *
      * @param rent период
      */
     @Transactional
@@ -64,7 +67,7 @@ public class RentService {
                 //Создаем новый период для каждого гаража
                 Contribution contribution = new Contribution();
                 contribution.setYear(rent.getYearRent());
-                if (garag.getPerson().getMemberBoard()  != null && garag.getPerson().getMemberBoard()  ) {
+                if (garag.getPerson().getMemberBoard() != null && garag.getPerson().getMemberBoard()) {
                     contribution.setMemberBoardOn(true);
                 } else {
                     contribution.setContribute(rent.getContributeMax());
@@ -84,8 +87,8 @@ public class RentService {
                     garag.setContributions(list);
                 }
                 garagService.save(garag);
-                for(Payment payment : paymentService.getPaymentOnGarag(garag)){
-                    paymentService.pay(payment,true,"default");
+                for (Payment payment : paymentService.getPaymentOnGarag(garag)) {
+                    paymentService.pay(payment, true, "default");
                 }
             }
         }
@@ -93,6 +96,7 @@ public class RentService {
 
     /**
      * Получение периода определенного года
+     *
      * @param year год
      * @return период
      */
@@ -102,13 +106,11 @@ public class RentService {
 
     /**
      * Получение всех периодов в отсортированном порядке
+     *
      * @return список периодов
      */
     public List<Rent> findAll() {
-        return rentDAO.findAll(sortByYearAsc());
+        return rentDAO.findAll();
     }
 
-    private Sort sortByYearAsc() {
-        return new Sort(Sort.Direction.DESC, "yearRent");
-    }
 }

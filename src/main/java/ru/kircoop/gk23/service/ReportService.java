@@ -1,24 +1,28 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.comparator.GaragComparator;
-import com.cooperate.dao.GaragDAO;
-import com.cooperate.dao.PaymentDAO;
-import com.cooperate.dto.ResultProfit;
-import com.cooperate.entity.Contribution;
-import com.cooperate.entity.Garag;
-import com.cooperate.entity.Payment;
-import com.cooperate.entity.Rent;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.kircoop.gk23.comparator.GaragComparator;
+import ru.kircoop.gk23.dao.GaragDAO;
+import ru.kircoop.gk23.dao.PaymentDAO;
+import ru.kircoop.gk23.dto.ResultProfit;
+import ru.kircoop.gk23.entity.Contribution;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
+import ru.kircoop.gk23.entity.Rent;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import static ru.kircoop.gk23.utils.DateUtils.DD_MM_YYYY_DOT;
+import static ru.kircoop.gk23.utils.DateUtils.DD_MM_YYYY_SLASH;
 
 /**
  * Сервис формирования отчетов
@@ -89,23 +93,23 @@ public class ReportService {
             HSSFRow nextRow = sheet.createRow(numberRow);
             HSSFCell countCell = nextRow.createCell(0);
             countCell.setCellValue(numberRow);
-            setColoredCell(numberRow,countCell,styleEven);
+            setColoredCell(numberRow, countCell, styleEven);
             HSSFCell garagCell = nextRow.createCell(1);
             garagCell.setCellValue(garag.getName());
-            setColoredCell(numberRow,garagCell,styleEven);
+            setColoredCell(numberRow, garagCell, styleEven);
             if (garag.getPerson() != null) {
                 HSSFCell fioCell = nextRow.createCell(2);
                 fioCell.setCellValue(garag.getPerson().getFIO());
-                setColoredCell(numberRow,fioCell,styleEven);
+                setColoredCell(numberRow, fioCell, styleEven);
                 HSSFCell phoneCell = nextRow.createCell(3);
                 phoneCell.setCellValue(garag.getPerson().getTelephone());
-                setColoredCell(numberRow,phoneCell,styleEven);
+                setColoredCell(numberRow, phoneCell, styleEven);
                 HSSFCell addressCell = nextRow.createCell(4);
-                addressCell.setCellValue(garag.getPerson().getAddress().getAddr());
-                setColoredCell(numberRow,addressCell,styleEven);
+                addressCell.setCellValue(garag.getPerson().getAddr());
+                setColoredCell(numberRow, addressCell, styleEven);
                 HSSFCell benefitsCell = nextRow.createCell(5);
                 benefitsCell.setCellValue(garag.getPerson().getBenefits());
-                setColoredCell(numberRow,benefitsCell,styleEven);
+                setColoredCell(numberRow, benefitsCell, styleEven);
             }
             numberRow++;
         }
@@ -158,20 +162,20 @@ public class ReportService {
             HSSFRow nextRow = sheet.createRow(numberRow);
             HSSFCell countCell = nextRow.createCell(0);
             countCell.setCellValue(numberRow);
-            setColoredCell(numberRow,countCell,styleEven);
+            setColoredCell(numberRow, countCell, styleEven);
             HSSFCell fioCell = nextRow.createCell(1);
             fioCell.setCellValue(garag.getPerson().getFIO());
-            setColoredCell(numberRow,fioCell,styleEven);
+            setColoredCell(numberRow, fioCell, styleEven);
             HSSFCell garagCell = nextRow.createCell(2);
             garagCell.setCellValue("Членская книжка ГК №23 " + garag.getSeries() + " ряд-" + garag.getNumber() + " место");
-            setColoredCell(numberRow,garagCell,styleEven);
+            setColoredCell(numberRow, garagCell, styleEven);
             HSSFCell benefitsCell = nextRow.createCell(3);
             benefitsCell.setCellValue(garag.getPerson().getBenefits());
-            setColoredCell(numberRow,benefitsCell,styleEven);
+            setColoredCell(numberRow, benefitsCell, styleEven);
             HSSFCell squedCell = nextRow.createCell(4);
             Long count = garagDAO.count();
             squedCell.setCellValue((51004 / count) + " кв. м.");
-            setColoredCell(numberRow,squedCell,styleEven);
+            setColoredCell(numberRow, squedCell, styleEven);
             numberRow++;
         }
         return workBook;
@@ -238,19 +242,19 @@ public class ReportService {
             phoneCell.setCellValue(garag.getPerson().getTelephone());
             setColoredCell(numberRow, phoneCell, rowStyleEven);
             HSSFCell addressCell = nextRow.createCell(4);
-            addressCell.setCellValue(garag.getPerson().getAddress().getAddr());
+            addressCell.setCellValue(garag.getPerson().getAddr());
             setColoredCell(numberRow, addressCell, rowStyleEven);
-            Float cont = 0f;
-            Float land = 0f;
-            Float target = 0f;
-            Integer fines = 0;
+            int cont = 0;
+            int land = 0;
+            int target = 0;
+            int fines = 0;
             for (Contribution c : garag.getContributions()) {
                 cont += c.getContribute();
                 land += c.getContLand();
                 target += c.getContTarget();
                 fines += c.getFines();
             }
-            Float sum = cont + land + target + fines + garag.getOldContribute();
+            long sum = cont + land + target + fines + garag.getOldContribute();
             HSSFCell allContributeColumn = nextRow.createCell(5);
             allContributeColumn.setCellValue(sum);
             setColoredCell(numberRow, allContributeColumn, rowStyleEven);
@@ -318,7 +322,7 @@ public class ReportService {
      * @param end   конец периода
      * @return документ word
      */
-    public HSSFWorkbook reportPayments(Calendar start, Calendar end) {
+    public HSSFWorkbook reportPayments(LocalDate start, LocalDate end) {
         HSSFWorkbook workBook = new HSSFWorkbook();
         HSSFSheet sheet = workBook.createSheet("Список платежей");
         sheet.setActive(true);
@@ -380,53 +384,50 @@ public class ReportService {
         }
         int numberRow = 1;
         //При выборе например 18 числа будет выборка всех платеже по 19.01.01 00:00:00
-        end.set(Calendar.DAY_OF_MONTH, end.get(Calendar.DAY_OF_MONTH) + 1);
-        for (Payment p : paymentDAO.findByDateBetween(start, end)) {
+        for (Payment p : paymentDAO.findByDateBetween(start, end.plusDays(1))) {
             HSSFRow nextRow = sheet.createRow(numberRow);
             HSSFCell countCell = nextRow.createCell(0);
             countCell.setCellValue(numberRow);
-            setColoredCell(numberRow,countCell,styleEven);
+            setColoredCell(numberRow, countCell, styleEven);
             HSSFCell numberCell = nextRow.createCell(1);
             numberCell.setCellValue(p.getNumber());
-            setColoredCell(numberRow,numberCell,styleEven);
-            Date dt = p.getDatePayment().getTime();
-            DateFormat ndf = new SimpleDateFormat("dd/MM/yyyy");
-            String dateFull = ndf.format(dt);
+            setColoredCell(numberRow, numberCell, styleEven);
+            String dateFull = p.getDatePayment().format(DD_MM_YYYY_SLASH);
             HSSFCell datePay = nextRow.createCell(2);
             datePay.setCellValue(dateFull);
-            setColoredCell(numberRow,datePay,styleEven);
+            setColoredCell(numberRow, datePay, styleEven);
             HSSFCell garagCell = nextRow.createCell(3);
             garagCell.setCellValue(p.getGarag().getName());
-            setColoredCell(numberRow,garagCell,styleEven);
+            setColoredCell(numberRow, garagCell, styleEven);
             HSSFCell fioCell = nextRow.createCell(4);
             fioCell.setCellValue(p.getFio());
-            setColoredCell(numberRow,fioCell,styleEven);
-            Float sum = p.getContributePay() + p.getContLandPay() + p.getContTargetPay() + p.getFinesPay() +
+            setColoredCell(numberRow, fioCell, styleEven);
+            int sum = p.getContributePay() + p.getContLandPay() + p.getContTargetPay() + p.getFinesPay() +
                     p.getPay() + p.getAdditionallyPay() + p.getOldContributePay();
             HSSFCell sumPayColumn = nextRow.createCell(5);
             sumPayColumn.setCellValue(sum);
-            setColoredCell(numberRow,sumPayColumn,styleEven);
+            setColoredCell(numberRow, sumPayColumn, styleEven);
             HSSFCell contributeColumn = nextRow.createCell(6);
             contributeColumn.setCellValue(p.getContributePay());
-            setColoredCell(numberRow,contributeColumn,styleEven);
+            setColoredCell(numberRow, contributeColumn, styleEven);
             HSSFCell landColumn = nextRow.createCell(7);
             landColumn.setCellValue(p.getContLandPay());
-            setColoredCell(numberRow,landColumn,styleEven);
+            setColoredCell(numberRow, landColumn, styleEven);
             HSSFCell tagetColumn = nextRow.createCell(8);
             tagetColumn.setCellValue(p.getContTargetPay());
-            setColoredCell(numberRow,tagetColumn,styleEven);
+            setColoredCell(numberRow, tagetColumn, styleEven);
             HSSFCell finesColumn = nextRow.createCell(9);
             finesColumn.setCellValue(p.getFinesPay());
-            setColoredCell(numberRow,finesColumn,styleEven);
+            setColoredCell(numberRow, finesColumn, styleEven);
             HSSFCell addingColumn = nextRow.createCell(10);
             addingColumn.setCellValue(p.getAdditionallyPay());
-            setColoredCell(numberRow,addingColumn,styleEven);
+            setColoredCell(numberRow, addingColumn, styleEven);
             HSSFCell oldContributeColumn = nextRow.createCell(11);
             oldContributeColumn.setCellValue(p.getOldContributePay());
-            setColoredCell(numberRow,oldContributeColumn,styleEven);
+            setColoredCell(numberRow, oldContributeColumn, styleEven);
             HSSFCell reminderColumn = nextRow.createCell(12);
             reminderColumn.setCellValue(p.getPay());
-            setColoredCell(numberRow,reminderColumn,styleEven);
+            setColoredCell(numberRow, reminderColumn, styleEven);
             numberRow++;
         }
 
@@ -485,7 +486,7 @@ public class ReportService {
      * @param end   конец периода
      * @return документ word
      */
-    public HSSFWorkbook reportProfit(Calendar start, Calendar end) {
+    public HSSFWorkbook reportProfit(LocalDate start, LocalDate end) {
         HSSFWorkbook workBook = new HSSFWorkbook();
         CellStyle styleHeader = workBook.createCellStyle();
         styleHeader.setWrapText(true);
@@ -507,24 +508,16 @@ public class ReportService {
             int number = 1;
             sheet.setColumnWidth(15, 10 * 256);
             //Находим гаражи с назначенными владельцами
-            List<Garag> garagList = garagDAO.findBySeriesAndPerson(series);
-            //Сортируем по номеру гаража
-            Collections.sort(garagList, new GaragComparator());
+            List<Payment> payments = paymentDAO.findPaymentOnSeriesGaragBetweenDate(series, start, end);
             //Период выбираеться по стартовой дате
-            Integer year = start.get(Calendar.YEAR);
+            Integer year = start.getYear();
             Rent rent = rentService.findByYear(year);
             if (rent != null) {
-                for (Garag g : garagList) {
+                for (Payment p : payments) {
                     //Находим платежи входящие в выбранный период для текущего гаража, заодно считаем их
-                    List<Payment> paymentsPeriod = new ArrayList<Payment>();
-                    for (Payment payment : g.getPayments()) {
-                        Calendar datePay = payment.getDatePayment();
-                        if (datePay.getTimeInMillis() >= start.getTimeInMillis() && datePay.getTimeInMillis() <= end.getTimeInMillis()) {
-                            paymentsPeriod.add(payment);
-                        }
-                    }
+
                     //Из количества платежей определяем количество строк в таблице для данного гаража
-                    lastRow = (paymentsPeriod.size() == 0) ? fistRow : fistRow + paymentsPeriod.size() - 1;
+                    lastRow = (payments.size() == 0) ? fistRow : fistRow + payments.size() - 1;
                     HSSFRow row = sheet.createRow(fistRow);
                     row.setHeightInPoints(30);
 
@@ -540,28 +533,28 @@ public class ReportService {
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 13, 13));
                     //Ряд
                     HSSFCell seriesCell = row.createCell(1);
-                    seriesCell.setCellValue(g.getSeries());
+                    seriesCell.setCellValue(p.getGarag().getSeries());
                     setColoredCell(number, seriesCell, rowStyleEven);
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 1, 1));
                     //Номер гаража
                     HSSFCell nubmerCell = row.createCell(2);
-                    nubmerCell.setCellValue(g.getNumber());
+                    nubmerCell.setCellValue(p.getGarag().getNumber());
                     setColoredCell(number, nubmerCell, rowStyleEven);
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 2, 2));
                     //ФИО владельца
                     HSSFCell fioCell = row.createCell(3);
                     sheet.setColumnWidth(3, 38 * 256);
-                    fioCell.setCellValue(g.getPerson().getFIO());
+                    fioCell.setCellValue(p.getGarag().getPerson().getFIO());
                     setColoredCell(number, fioCell, rowStyleEven);
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 3, 3));
                     //Задолжность после оплат выбранного года
-                    float contribute = 0f;
-                    float contLand = 0f;
-                    float contTarget = 0f;
-                    float old = g.getOldContribute();
+                    int contribute = 0;
+                    int contLand = 0;
+                    int contTarget = 0;
+                    int old = p.getGarag().getOldContribute();
                     int fines = 0;
-                    Contribution contribution = contributionService.getContributionByGaragAndYear(g.getId(), year);
-                    for (Contribution c : g.getContributions()) {
+                    Contribution contribution = contributionService.getContributionByGaragAndYear(p.getGarag().getId(), year);
+                    for (Contribution c : p.getGarag().getContributions()) {
                         if (c.getYear() <= year) {
                             contribute += c.getContribute();
                             contLand += c.getContLand();
@@ -569,7 +562,7 @@ public class ReportService {
                             fines += c.getFines();
                         }
                     }
-                    Float sumContributions = contribute + contLand + contTarget + fines + old;
+                    long sumContributions = contribute + contLand + contTarget + fines + old;
                     //Долг после оплат
                     HSSFCell contributeSumNewCell = row.createCell(24);
                     setColoredCell(number, contributeSumNewCell, rowStyleEven);
@@ -601,10 +594,10 @@ public class ReportService {
                     setColoredCell(number, contFinesNewCell, rowStyleEven);
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 29, 29));
                     //Начисления текущего года
-                    float rentSum = 0f;
-                    float rentContribute = 0f;
-                    float rentContLand = 0f;
-                    float rentContTarget = 0f;
+                    int rentSum = 0;
+                    int rentContribute = 0;
+                    int rentContLand = 0;
+                    int rentContTarget = 0;
                     if (contribution != null) {
                         rentContribute = (!contribution.isMemberBoardOn()) ? rent.getContributeMax() : 0;
                         rentContLand = (contribution.isBenefitsOn()) ? rent.getContLandMax() / 2 : rent.getContLandMax();
@@ -634,23 +627,23 @@ public class ReportService {
                     //Приход
                     int t = fistRow;
                     if ((number % 2) == 0) {
-                        coloredPayments(paymentsPeriod, row, rowStyleEven);
+                        coloredPayments(payments, row, rowStyleEven);
                     }
-                    for (Payment p : paymentsPeriod) {
+                    for (Payment pay : payments) {
                         if (t == fistRow) {
-                            calculatePayment(row, p, number, rowStyleEven);
+                            calculatePayment(row, pay, number, rowStyleEven);
                         } else {
                             HSSFRow rowNext = sheet.createRow(t);
-                            calculatePayment(rowNext, p, number, rowStyleEven);
+                            calculatePayment(rowNext, pay, number, rowStyleEven);
                         }
                         t++;
                     }
                     //Задолжность до оплат выбранного года
-                    float pastContribute = 0f;
-                    float pastContLand = 0f;
-                    float pastContTarget = 0f;
-                    float pastOld = 0f;
-                    for (Payment payment : paymentsPeriod) {
+                    int pastContribute = 0;
+                    int pastContLand = 0;
+                    int pastContTarget = 0;
+                    int pastOld = 0;
+                    for (Payment payment : payments) {
                         pastContribute += payment.getContributePay();
                         pastContLand += payment.getContLandPay();
                         pastContTarget += payment.getContTargetPay();
@@ -660,7 +653,7 @@ public class ReportService {
                     pastContLand += contLand - rentContLand;
                     pastContTarget += contTarget - rentContTarget;
                     pastOld += old;
-                    float sumOldContribute = pastContribute + pastContLand + pastContTarget + pastOld;
+                    int sumOldContribute = pastContribute + pastContLand + pastContTarget + pastOld;
                     //Сумма прошлой задолжности
                     HSSFCell oldContributeSumCell = row.createCell(4);
                     oldContributeSumCell.setCellValue(new BigDecimal(sumOldContribute).setScale(2, RoundingMode.UP).floatValue());
@@ -687,10 +680,10 @@ public class ReportService {
                     setColoredCell(number, pastOldCell, rowStyleEven);
                     sheet.addMergedRegion(new CellRangeAddress(fistRow, lastRow, 8, 8));
                     //Счетчики
-                    if (paymentsPeriod.size() == 0) {
+                    if (payments.size() == 0) {
                         fistRow += 1;
                     }
-                    fistRow += paymentsPeriod.size();
+                    fistRow += payments.size();
                     number++;
                 }
             }
@@ -1050,9 +1043,7 @@ public class ReportService {
         numberPay.setCellValue(p.getNumber());
         //Дата платежа
         HSSFCell datePay = row.createCell(15);
-        Date dt = p.getDatePayment().getTime();
-        DateFormat ndf = new SimpleDateFormat("dd.MM.yyyy");
-        datePay.setCellValue(ndf.format(dt));
+        datePay.setCellValue(p.getDatePayment().format(DD_MM_YYYY_DOT));
         setColoredCell(number, datePay, style);
         //Сумма платежа
         HSSFCell sumPay = row.createCell(16);

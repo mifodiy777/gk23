@@ -7,6 +7,7 @@ import ru.kircoop.gk23.dao.GaragDAO;
 import ru.kircoop.gk23.dao.Impl.CustomDAOImpl;
 import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.entity.Person;
+import ru.kircoop.gk23.exception.ServiceException;
 
 import java.util.List;
 
@@ -36,28 +37,18 @@ public class GaragService {
      * @return Сохраненный гараж с заполненным id
      */
     @Transactional
-    public Garag saveOrUpdate(Garag garag) throws ExistGaragException {
-        //Редактирование гаража
-        if (!customDAO.existGarag(garag)) {
-            //Гараж новый, а владелец взят из базы.
-            if (garag.getId() == null && garag.getPerson() != null && garag.getPerson().getId() != null) {
-                Person p = garag.getPerson();
-                garag.setPerson(null);
-                Garag getGarag = garagDAO.save(garag);
-                getGarag.setPerson(p);
-                return garagDAO.save(getGarag);
-            }
-            //Если гараж уже есть в базе, не трогаем Историю, Платежи, Периоды.
-            if (garag.getId() != null) {
-                Garag garagEdit = garagDAO.findOne(garag.getId());
-                garag.setContributions(garagEdit.getContributions());
-                garag.setPayments(garagEdit.getPayments());
-                garag.setHistoryGarags(garagEdit.getHistoryGarags());
-            }
-            //Во всех остальных случиях просто сохраняем гараж.
+    public Garag saveOrUpdate(Garag garag) throws ServiceException {
+        //Гараж новый и владелец новый
+        if (garag.getId() == null) {
             return garagDAO.save(garag);
+        } else {
+            //Если гараж уже есть в базе, не трогаем Историю, Платежи, Периоды.
+            Garag garagEdit = garagDAO.findById(garag.getId()).orElseThrow(() -> new ServiceException("Не найден гараж для изменения"));
+            garag.setContributions(garagEdit.getContributions());
+            garag.setHistoryGarags(garagEdit.getHistoryGarags());
         }
-        throw new ExistGaragException();
+        //Во всех остальных случиях просто сохраняем гараж.
+        return garagDAO.save(garag);
     }
 
     /**
@@ -146,11 +137,14 @@ public class GaragService {
             //Очищаем id владельца
             person.setId(null);
             //Очищаем адрес
-            person.getAddress().setId(null);
+            person.setCity(null);
+            person.setStreet(null);
+            person.setApartment(null);
+            person.setHome(null);
         }
         //Если гараж у данного владельца не один, владельца необходимо удалить, поиск
         if (!oneGarag && deletePerson && !searchPerson) {
-            for (Garag g : garag.getPerson().getGaragList()) {
+            for (Garag g : garagDAO.findByPerson(garag.getPerson())) {
                 historyGaragService.saveReason(reason, garag.getPerson().getFIO(), g);
             }
             personService.saveOrUpdate(person);
@@ -163,7 +157,7 @@ public class GaragService {
         } else {
             Person oldPerson = personService.getPerson(oldPersonId);
             person = personService.saveOrUpdate(person);
-            for (Garag g : oldPerson.getGaragList()) {
+            for (Garag g : garagDAO.findByPerson(oldPerson)) {
                 historyGaragService.saveReason(reason, garag.getPerson().getFIO(), g);
                 g.setPerson(person);
                 save(g);

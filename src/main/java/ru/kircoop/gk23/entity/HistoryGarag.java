@@ -2,7 +2,7 @@ package ru.kircoop.gk23.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -14,7 +14,7 @@ public class HistoryGarag implements Serializable {
     private Integer id;
 
     @Column(name = "date_record")
-    private Calendar dateRecord;
+    private LocalDateTime dateRecord;
 
     @Column(name = "fio_last_person")
     private String fioLastPerson;
@@ -25,7 +25,7 @@ public class HistoryGarag implements Serializable {
     public HistoryGarag() {
     }
 
-    public HistoryGarag(Calendar dateRecord, String fioLastPerson, String reason, Garag garag) {
+    public HistoryGarag(LocalDateTime dateRecord, String fioLastPerson, String reason, Garag garag) {
         this.dateRecord = dateRecord;
         this.fioLastPerson = fioLastPerson;
         this.reason = reason;
@@ -39,11 +39,11 @@ public class HistoryGarag implements Serializable {
         this.id = id;
     }
 
-    public Calendar getDateRecord() {
+    public LocalDateTime getDateRecord() {
         return dateRecord;
     }
 
-    public void setDateRecord(Calendar dateRecord) {
+    public void setDateRecord(LocalDateTime dateRecord) {
         this.dateRecord = dateRecord;
     }
 

@@ -37,12 +37,7 @@ public class Garag implements Serializable {
 
     //Долги прошлых лет не облагаемые пенями
     @Column(name = "old_contribute", nullable = false)
-    private float oldContribute;
-
-    //Платежи
-    @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("datePayment DESC")
-    private List<Payment> payments;
+    private int oldContribute;
 
     //История изменений      
     @OneToMany(cascade = CascadeType.ALL)
@@ -90,11 +85,11 @@ public class Garag implements Serializable {
         this.contributions = contributions;
     }
 
-    public float getOldContribute() {
+    public int getOldContribute() {
         return oldContribute;
     }
 
-    public void setOldContribute(float oldContribute) {
+    public void setOldContribute(int oldContribute) {
         this.oldContribute = oldContribute;
     }
 
@@ -104,14 +99,6 @@ public class Garag implements Serializable {
 
     public void setAdditionalInformation(String additionalInformation) {
         this.additionalInformation = additionalInformation;
-    }
-
-    public List<Payment> getPayments() {
-        return payments;
-    }
-
-    public void setPayments(List<Payment> payments) {
-        this.payments = payments;
     }
 
     public List<HistoryGarag> getHistoryGarags() {

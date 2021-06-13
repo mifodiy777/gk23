@@ -6,14 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kircoop.gk23.dao.ContributionDAO;
-import ru.kircoop.gk23.dao.Impl.CustomDAOImpl;
 import ru.kircoop.gk23.dao.RentDAO;
 import ru.kircoop.gk23.entity.Contribution;
 import ru.kircoop.gk23.entity.Rent;
 
-import java.time.LocalTime;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Optional;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -26,9 +25,6 @@ public class ContributionService {
 
     @Autowired
     private ContributionDAO contributionDAO;
-
-    @Autowired
-    private CustomDAOImpl customDAO;
 
     @Autowired
     private RentDAO rentDAO;
@@ -67,25 +63,25 @@ public class ContributionService {
             int sumContribute = c.getSumFixed(); //Находим сумму долга
             //Вычисляем кол-во дней с последнего обновления.
             //Первая дата должна устанавливаться при включении режима пеней
-            LocalTime now = LocalTime.now();
+            LocalDateTime now = LocalDateTime.now();
             if (sumContribute != 0) {
                 try {
                     // получаем кол-во дней с последнего обновления
-                    long days = DAYS.between( LocalDateTime.ofInstant(calendar.toInstant(), calendar.getTimeZone().toZoneId()).toLocalDate();c.getFinesLastUpdate().get, now);Days.daysBetween(new DateTime(c.getFinesLastUpdate().getTimeInMillis()), now).getDays();
+                    long days = DAYS.between(c.getFinesLastUpdate(), now);
                     //Получаем пени за один день для текущего долга
                     double unit = sumContribute * 0.001;
                     // Получаем точную сумму пеней
-                    Double finesDouble = unit * days;
+                    double finesDouble = unit * days;
                     //Округляем пени до 50
                     long fines = (int) (finesDouble / 50) * 50;
                     if (fines != 0) {
                         //Вычисляем разницу дней для правильной установки даты последнего обновления пеней в связи с округлением
                         //Получаем разницу в сумме пеней
-                        long difference = (finesDouble.intValue() % 50);
+                        long difference = ((int) finesDouble % 50);
                         //Если есть остаток от округления до 50, то определяем кол-во дней для достижения этой суммы
                         int dayDifference = (difference > 0) ? (int) Math.ceil(difference / unit) : 0;
                         //Устанавливаем полученную дату после всех вычислений
-                        c.setFinesLastUpdate(now.minusDays(dayDifference).toGregorianCalendar());
+                        c.setFinesLastUpdate(now.minusDays(dayDifference).toLocalDate());
                         //Суммируем существующие пени с вычисленными
                         int newFines = (int) (c.getFines() + fines);
 
@@ -98,7 +94,7 @@ public class ContributionService {
                             //Если новые пени больши суммы долгов определяем сумму начислений этого года и отключаем пени
                             c.setFinesOn(false);
                             if (c.getFines() == 0) {
-                                c.setFines(sumContribute.intValue());
+                                c.setFines(sumContribute);
                             }
                         }
                     }
@@ -120,9 +116,9 @@ public class ContributionService {
     public void onFines(Calendar now) {
         Rent rent = rentDAO.findByYearRent(now.get(Calendar.YEAR));
         //Дата для 1 января текущего года
-        Calendar newYear = new GregorianCalendar(now.get(Calendar.YEAR), 0, 1);
+        LocalDate newYear = LocalDate.of(now.get(Calendar.YEAR), 1, 1);
         //Дата для 1 июля текущего года
-        Calendar july = new GregorianCalendar(now.get(Calendar.YEAR), 6, 1);
+        LocalDate july = LocalDate.of(now.get(Calendar.YEAR), 7, 1);
 
         //Включение пеней для должников со следующего года
         for (Contribution c : contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)) {
@@ -146,14 +142,14 @@ public class ContributionService {
     private Integer getRentMax(Rent rent, Contribution c) {
         int rentMax = 0;
         if (!c.isMemberBoardOn()) {
-            rentMax += Math.round(rent.getContributeMax());
+            rentMax += rent.getContributeMax();
         }
         if (c.isBenefitsOn()) {
-            rentMax += Math.round(rent.getContLandMax()) / 2;
+            rentMax += rent.getContLandMax() / 2;
         } else {
-            rentMax += Math.round(rent.getContLandMax());
+            rentMax += rent.getContLandMax();
         }
-        rentMax += Math.round(rent.getContTargetMax());
+        rentMax += rent.getContTargetMax();
         return rentMax;
     }
 }
