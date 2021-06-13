@@ -1,5 +1,6 @@
 package ru.kircoop.gk23.dao.Impl;
 
+import org.springframework.stereotype.Repository;
 import ru.kircoop.gk23.entity.Garag;
 
 import javax.persistence.EntityManager;
@@ -14,6 +15,7 @@ import java.util.List;
 /**
  * Created by Кирилл on 01.04.2017.
  */
+@Repository
 public class CustomDAOImpl {
 
     private static final String SUM_CONTRIBUTE = "SELECT (sum(c.contribute)+sum(c.cont_land)+sum(c.cont_target)+sum(c.fines))+g.old_contribute AS SUM " +

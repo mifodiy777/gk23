@@ -64,6 +64,13 @@ public class Contribution implements Serializable {
     @Column(name = "member_board_on")
     private boolean memberBoardOn;
 
+    public Contribution(Integer year) {
+        this.year = year;
+    }
+
+    public Contribution() {
+    }
+
     public Integer getId() {
         return id;
     }
