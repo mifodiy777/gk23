@@ -1,0 +1,69 @@
+<div>
+    <div class="navbar navbar-custom navbar-static-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                        data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">ГК №23</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/">ГК №23</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li th:classappend="${#request.requestURI == '/garags.html' ? 'active':''}">
+                        <a th:href="@{/garagPage}"><span class="glyphicon glyphicon-home"></span> Гаражи</a>
+                    </li>
+                    <li th:classappend="${#request.requestURI == '/persons.html' ? 'active':''}">
+                        <a th:href="@{/persons}"><span class="glyphicon glyphicon-user"></span> Владельцы</a>
+                    </li>
+                    <li th:classappend="${#request.requestURI == '/payments.html' ? 'active':''}">
+                        <a th:href="@{/paymentsPage}"><span class="glyphicon glyphicon-credit-card"></span>Платежи</a>
+                    </li>
+                    <li class="dropdown">
+                        <a id="reportPageBtn" href="#" class="dropdown-toggle" data-toggle="dropdown"
+                           role="button" aria-expanded="false"><span class="glyphicon glyphicon-stats"></span> Отчеты
+                        </a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li>
+                                <a th:href="@{/reportAllPerson}"><span
+                                        class="glyphicon glyphicon-open-file"></span> Общий список</a>
+                            </li>
+                            <li>
+                                <a th:href="@{/reportBenefitsPerson}"><span
+                                        class="glyphicon glyphicon-open-file"></span> Список льготников</a>
+                            </li>
+                            <li>
+                                <a th:href="@{/reportContribute}"><span
+                                        class="glyphicon glyphicon-open-file"></span> Список должников</a>
+                            </li>
+                            <li>
+                                <a th:href="@{/reportOther}">Дополнительные отчеты</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li th:classappend="${#request.requestURI == '/members.html' ? 'active':''}">
+                        <a th:href="@{/membersPage}"><span class="glyphicon glyphicon-tower"></span>
+                            Члены правления</a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="openNewRent()"><span class="glyphicon glyphicon-plus-sign"></span>
+                            Новый период</a>
+                    </li>
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li th:classappend="${#request.requestURI == '/help.html' ? 'active':''}">
+                        <a th:href="@{/help.html}"><span class="glyphicon glyphicon-question-sign"></span>
+                            Помощь</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="messages" class="pull-right alert alert-info fade in " style="width: 20%; display: none"></div>
+    <div id="modalDiv"></div>
+</div>

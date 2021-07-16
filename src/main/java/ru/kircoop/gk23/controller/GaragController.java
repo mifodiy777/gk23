@@ -3,11 +3,13 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 import ru.kircoop.gk23.converter.GaragConverter;
 import ru.kircoop.gk23.dto.GaragView;
 import ru.kircoop.gk23.service.ContributionService;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
  * Контороллер по работе с гаражами
  * Created by Кирилл on 25.07.2015.
  */
-@RestController
+@Controller
 public class GaragController {
 
     @Autowired
@@ -55,24 +57,24 @@ public class GaragController {
         return new ResponseEntity<>(garags, HttpStatus.OK);
     }
 
-    /*    *//*
+    /*
      * Получение страницы всех гаражей
      *
      * @param series ряд, по умолчанию 1.
      * @param map    Model map
      * @return garags.jsp
-     *//*
-    @RequestMapping(value = "garagPage", method = RequestMethod.GET)
-    public String getGaragsPage(@RequestParam(defaultValue = "1", value = "series") String series, ModelMap map) {
-        map.addAttribute("setSeries", series); //ряд, по умолчанию выбирается ряд "1"
+     */
+    @GetMapping(value = "garagPage")
+    public String getGaragsPage(@RequestParam(defaultValue = "1", value = "series") String series, Model model) {
+        model.addAttribute("setSeries", series); //ряд, по умолчанию выбирается ряд "1"
         try {
-            map.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
+            model.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
             return "garags";
         } catch (DataAccessResourceFailureException e) {
-            map.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
+            model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";
         }
-    }*/
+    }
 
     /**
      * Получение списка гаражей
