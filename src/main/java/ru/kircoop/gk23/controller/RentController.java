@@ -3,17 +3,18 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.kircoop.gk23.converter.RentConverter;
+import ru.kircoop.gk23.dto.RentView;
 import ru.kircoop.gk23.entity.Rent;
 import ru.kircoop.gk23.service.RentService;
 
 import javax.servlet.http.HttpServletResponse;
 
-@RestController
+@Controller
 public class RentController {
 
     @Autowired
@@ -30,15 +31,15 @@ public class RentController {
      * @return Если не существует начисление текущего года, то отображается форма создания нового начисления modalNewRent.jsp
      * Если существует, то отображается ошибка создания нового начисления.
      */
-    @RequestMapping(value = "checkYearRent", method = RequestMethod.GET)
-    public String checkYearRent(@RequestParam("year") Integer year, ModelMap map,
+    @GetMapping(value = "checkYearRent")
+    public String checkYearRent(@RequestParam("year") Integer year, Model map,
                                 HttpServletResponse response) {
         if (rentService.checkRent(year)) {
             map.addAttribute("year", year);
             map.addAttribute("rent", new Rent());
             return "modalNewRent";
         } else {
-            map.put("message", "Период текущего года существует");
+            map.addAttribute("message", "Период текущего года существует");
             response.setStatus(409);
             return "error";
         }
@@ -51,13 +52,13 @@ public class RentController {
      * @param map  ModelMap
      * @return Сообщение о результате сохранения нового начисления
      */
-    @RequestMapping(value = "saveRent", method = RequestMethod.POST)
-    public String saveRent(Rent rent, ModelMap map) {
-        rentService.saveOrUpdate(rent);
-        rentService.createNewPeriod(rent);
+    @PostMapping(value = "saveRent")
+    public String saveRent(RentView rent, Model map) {
+        Rent entityRent = RentConverter.fromView(rent);
+        rentService.saveOrUpdate(entityRent);
+        rentService.createNewPeriod(entityRent);
         LOGGER.info("Создан новый период-" + rent.getYearRent());
-        map.put("message", "Сумма оплаты за " + rent.getYearRent() + " год введена!");
+        map.addAttribute("message", "Сумма оплаты за " + rent.getYearRent() + " год введена!");
         return "success";
     }
-
 }

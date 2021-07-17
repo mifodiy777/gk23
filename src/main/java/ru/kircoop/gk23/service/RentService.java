@@ -104,13 +104,4 @@ public class RentService {
         return rentDAO.findByYearRent(year);
     }
 
-    /**
-     * Получение всех периодов в отсортированном порядке
-     *
-     * @return список периодов
-     */
-    public List<Rent> findAll() {
-        return rentDAO.findAll();
-    }
-
 }
