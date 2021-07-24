@@ -3,6 +3,7 @@ package ru.kircoop.gk23.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.kircoop.gk23.dao.Impl.CustomDAOImpl;
 import ru.kircoop.gk23.dao.PersonDAO;
 import ru.kircoop.gk23.entity.Person;
 
@@ -16,6 +17,9 @@ public class PersonService {
 
     @Autowired
     private PersonDAO personDAO;
+
+    @Autowired
+    private CustomDAOImpl customDAO;
 
     /**
      * Сохранение владельца
@@ -49,6 +53,14 @@ public class PersonService {
             return personDAO.findByPersonfio(fio);
         }
         return personDAO.findTop30By();
+    }
+
+    /**
+     * Получить список владельцев не имеющих гаражей в кооперативе
+     * @return
+     */
+    public List<Person> getEmptyPersons() {
+        return customDAO.findPersonWithoutGarag();
     }
 
     /**

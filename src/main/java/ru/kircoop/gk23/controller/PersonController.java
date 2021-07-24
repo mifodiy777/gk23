@@ -3,11 +3,15 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kircoop.gk23.service.GaragService;
 import ru.kircoop.gk23.service.PersonService;
 
-@RestController
+@Controller
 public class PersonController {
 
     @Autowired
@@ -42,7 +46,19 @@ public class PersonController {
         return Utils.convertListToJson(gson, personService.getPersons(fio));
     }
 
-    *//**
+        /**
+     * Получение владельцев без гаража
+     *
+     * @return JSON список владельцев
+     */
+/*    @RequestMapping(value = "emptyPersons", method = RequestMethod.GET)
+    public ResponseEntity<String> getEmptyPersons() {
+        GsonBuilder gson = new GsonBuilder();
+        gson.registerTypeAdapter(Person.class, new PersonPageAdapter());
+        return Utils.convertListToJson(gson, personService.getEmptyPersons());
+    }*/
+
+    /**
      * Страница членов правления
      *
      * @return members.jsp
