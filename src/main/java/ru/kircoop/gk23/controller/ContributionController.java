@@ -3,6 +3,7 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -61,7 +62,7 @@ public class ContributionController {
             map.addAttribute("garag", garagService.getGarag(id));
             map.addAttribute("max", rentService.findByYear(year));
             return "modalEditContribute";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             LOGGER.error("Невозможно получить форму долгового периода, ошибка БД!");
             map.put("message", "Невозможно получить форму долгового периода, ошибка БД!");
             response.setStatus(409);
@@ -94,7 +95,7 @@ public class ContributionController {
                     contribute.getYear() + " год назначен");
             map.addAttribute("message", "Долг за " + contribute.getYear() + " год введен успешно!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.addAttribute("message", "Невозможно сохранить долг");
             response.setStatus(409);
             return "error";

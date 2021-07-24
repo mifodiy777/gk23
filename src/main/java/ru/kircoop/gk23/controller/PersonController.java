@@ -142,7 +142,7 @@ public class PersonController {
             logger.info("Удален гараж у владельца(" + garag.getName() + ")");
             map.put("message", "Назначение удаленно!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.put("message", "Невозможно удалить, так как гараж используется!");
             response.setStatus(409);
             return "error";
@@ -169,7 +169,7 @@ public class PersonController {
             personService.delete(id);
             map.put("message", "Владелец удален!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.put("message", "Невозможно удалить, так как владелец используется!");
             response.setStatus(409);
             return "error";

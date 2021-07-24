@@ -45,6 +45,10 @@
                             </li>
                         </ul>
                     </li>
+                    <li th:classappend="${#request.requestURI == '/costs.html' ? 'active':''}">
+                        <a th:href="@{/costsPage}"><span class="glyphicon glyphicon-usd"></span>
+                            Расходы</a>
+                    </li>
                     <li th:classappend="${#request.requestURI == '/members.html' ? 'active':''}">
                         <a th:href="@{/membersPage}"><span class="glyphicon glyphicon-tower"></span>
                             Члены правления</a>

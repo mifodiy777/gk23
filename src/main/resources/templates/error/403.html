@@ -1,0 +1,27 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<header th:replace="header.html :: head"></header>
+<div th:replace="navbar.html :: div"></div>
+<style>
+    body {
+        background-color: #eee;
+        background-image:  url('../images/furley_bg.jpg');
+        background-size: 100%;
+        background-color: darkgray;
+    }
+
+    .vertical-and-horizontal-offset {
+        padding-top: 20%;
+    }
+</style>
+
+<div class="container">
+    <div class="vertical-and-horizontal-offset">
+        <h1 style="text-align: center;">Доступ запрещен!</h1>
+        <p style="color: #f3a02c; text-align: center">К сожалению, у Вас нет прав доступа к запрашиваемой странице</p>
+        <p style="text-align: center;"><a onclick="window.history.back();">Вернуться на предыдущую страницу</a></p>
+    </div>
+</div>
+
+
+
+

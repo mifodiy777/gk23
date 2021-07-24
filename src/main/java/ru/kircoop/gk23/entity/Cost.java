@@ -2,6 +2,7 @@ package ru.kircoop.gk23.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Objects;
@@ -44,7 +45,7 @@ public class Cost implements Serializable {
      */
     @OrderBy("date desc ")
     @Column(name = "date", nullable = false)
-    private LocalDateTime date;
+    private LocalDate date;
 
     public Integer getId() {
         return id;
@@ -78,11 +79,11 @@ public class Cost implements Serializable {
         this.money = money;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

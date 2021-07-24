@@ -1,0 +1,8 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<div id="success_message" onclick="$('#messages').hide();" style="display:none">
+    <a href="#" class="close">&times;</a>
+    <span th:text="${message}">success</span>
+</div>
+<script type="text/javascript">
+    $("#success_message").show(800);
+</script>

@@ -3,6 +3,7 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -80,7 +81,7 @@ public class GaragController {
         try {
             model.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
             return "garags";
-        } catch (DataAccessResourceFailureException e) {
+        } catch (DataAccessException e) {
             model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";
         }
@@ -102,7 +103,7 @@ public class GaragController {
             model.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
             model.addAttribute("garagId", id); // id выбранного гаража
             return "garags";
-        } catch (DataAccessResourceFailureException e) {
+        } catch (DataAccessException e) {
             model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";
         }
@@ -247,7 +248,7 @@ public class GaragController {
             map.addAttribute("message", "Невозможно создать гараж, так как он уже существует!");
             response.setStatus(409);
             return "error";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             LOGGER.error(e.getMessage());
             map.addAttribute("message", "Ошибка по работе с БД!");
             response.setStatus(409);
@@ -316,7 +317,7 @@ public class GaragController {
             LOGGER.info("Гараж " + garag.getName() + " удален!");
             map.put("message", "Гараж удален!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.put("message", "Невозможно удалить, так как гараж используется!");
             response.setStatus(409);
             return "error";

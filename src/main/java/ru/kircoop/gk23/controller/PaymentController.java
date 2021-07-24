@@ -42,7 +42,7 @@ public class PaymentController {
             map.addAttribute("years", paymentService.findYears());
             map.addAttribute("rents", rentService.getRents());
             return "payments";
-        } catch (DataAccessResourceFailureException e) {
+        } catch (DataAccessException e) {
             map.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";
         }
@@ -123,7 +123,7 @@ public class PaymentController {
             logger.info("Платеж к гаражу " + garag + " удален!");
             map.put("message", "Платеж удален!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.put("message", "Невозможно удалить платеж");
             response.setStatus(409);
             return "error";

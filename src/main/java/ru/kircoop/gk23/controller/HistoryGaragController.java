@@ -1,6 +1,7 @@
 package ru.kircoop.gk23.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,7 +49,7 @@ public class HistoryGaragController {
             historyGaragService.delete(idReason);
             map.addAttribute("message", "Запись о смене владельца удалена!");
             return "success";
-        } catch (DataIntegrityViolationException e) {
+        } catch (DataAccessException e) {
             map.addAttribute("message", "Невозможно удалить!");
             response.setStatus(409);
             return "error";
