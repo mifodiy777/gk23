@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import ru.kircoop.gk23.converter.CostConverter;
+import ru.kircoop.gk23.converter.CostTypeConverter;
+import ru.kircoop.gk23.dto.CostTypeView;
 import ru.kircoop.gk23.dto.CostView;
+import ru.kircoop.gk23.entity.Cost;
 import ru.kircoop.gk23.entity.CostType;
 import ru.kircoop.gk23.service.CostService;
 import ru.kircoop.gk23.utils.ResponseUtils;
@@ -36,31 +39,31 @@ public class CostController {
     /**
      * Страница с формой добавления расходов
      *
-     * @return страница cost.jsp
+     * @return страница cost.html
      */
-/*    @GetMapping(value = "cost")
+    @GetMapping(value = "cost")
     public String addGaragForm(Model map) {
-        map.addAttribute("cost", new Cost());
+        map.addAttribute("cost", new CostView());
         return "cost";
-    }*/
+    }
 
     /**
      * Отображение формы редактирования типа расхода
      *
      * @param id  id типа расхода
      * @param map Model
-     * @return costType.jsp
+     * @return costType.html
      */
-/*    @GetMapping(value = "costType/{id}")
+    @GetMapping(value = "costType/{id}")
     public String editGaragForm(@PathVariable("id") Integer id, Model map) {
-        map.addAttribute("costType", service.getType(id));
+        map.addAttribute("costType", CostTypeConverter.map(service.getType(id)));
         return "costType";
-    }*/
+    }
 
     /**
      * Страница расходами
      *
-     * @return страница costs.jsp
+     * @return страница costs.html
      */
     @GetMapping(value = "costsPage")
     public String getCostsPage() {
@@ -70,12 +73,12 @@ public class CostController {
     /**
      * Страница с типами расходов
      *
-     * @return страница costs.jsp
+     * @return страница costTypes.html
      */
-/*    @GetMapping(value = "costTypesPage")
+    @GetMapping(value = "costTypesPage")
     public String getCostTypesPage() {
         return "costTypes";
-    }*/
+    }
 
     /**
      * @return список всех расходов
@@ -85,70 +88,73 @@ public class CostController {
         List<CostView> viewList = service.getAll().stream().map(CostConverter::map).collect(Collectors.toList());
         return ResponseUtils.convertListToJson(viewList);
     }
-//
-//    /**
-//     * @return список всех расходов
-//     */
-//    @GetMapping(value = "getCostTypes")
-//    public ResponseEntity<String> getCostType() {
-//        GsonBuilder gson = new GsonBuilder();
-//        return Utils.convertListToJson(gson, service.getTypes());
-//    }
+
+    /**
+     * @return список всех типов расходов
+     */
+    @GetMapping(value = "getCostTypes")
+    public ResponseEntity<String> getCostType() {
+        List<CostTypeView> typeViewList = service.getTypes().stream().map(CostTypeConverter::map).collect(Collectors.toList());
+        return ResponseUtils.convertListToJson(typeViewList);
+    }
 
     /**
      * @return список типов расходов
      */
     @PostMapping(value = "getTypes")
     public @ResponseBody
-    ResponseEntity<List<CostType>> getTypes() {
-        return new ResponseEntity<>(service.getTypes(), HttpStatus.OK);
+    ResponseEntity<List<CostTypeView>> getTypes() {
+        List<CostTypeView> typeViews = service.getTypes().stream().map(CostTypeConverter::map).collect(Collectors.toList());
+        return new ResponseEntity<>(typeViews, HttpStatus.OK);
     }
 
     /**
      * Сохранение расхода
      *
-     * @param cost расход
+     * @param dto расход
      * @return сообщение
      */
-//    @PostMapping(value = "saveCost")
-//    public String saveCost(Cost cost, Model map, HttpServletResponse response) {
-//        try {
-//            service.saveCost(cost);
-//            LOGGER.info("Запись о расходе: " + cost.getType().getName() + " произведена");
-//            map.addAttribute("message", "Запись о расходе произведена");
-//            return "success";
-//        } catch (Exception e) {
-//            map.addAttribute("message", "Ошибка по работе с БД! Попробуйте снова выбрать тип.");
-//            response.setStatus(409);
-//            return "error";
-//        }
-//    }
+    @PostMapping(value = "saveCost")
+    public String saveCost(CostView dto, Model map, HttpServletResponse response) {
+        try {
+            Cost cost = CostConverter.fromView(dto);
+            service.saveCost(cost);
+            LOGGER.info("Запись о расходе: " + cost.getType().getName() + " произведена");
+            map.addAttribute("message", "Запись о расходе произведена");
+            return "success";
+        } catch (Exception e) {
+            map.addAttribute("message", "Ошибка по работе с БД! Попробуйте снова выбрать тип.");
+            response.setStatus(409);
+            return "error";
+        }
+    }
 
     /**
      * Изменение типа расхода
      *
-     * @param type тип расхода
+     * @param typeView тип расхода
      * @return сообщение
      */
-//    @PostMapping(value = "saveType")
-//    public String saveCostType(CostType type, Model map, HttpServletResponse response) {
-//        try {
-//            if (!service.existType(type)) {
-//                service.saveType(type);
-//                LOGGER.info("Запись о типе расхода: " + type.getName() + " произведена");
-//                map.addAttribute("message", "Запись о типе расхода изменена");
-//                return "success";
-//            } else {
-//                map.addAttribute("message", "Название типа расхода должно быть уникальным.");
-//                response.setStatus(409);
-//                return "error";
-//            }
-//        } catch (Exception e) {
-//            map.addAttribute("message", "Ошибка по работе с БД!");
-//            response.setStatus(409);
-//            return "error";
-//        }
-//    }
+    @PostMapping(value = "saveType")
+    public String saveCostType(CostTypeView typeView, Model map, HttpServletResponse response) {
+        try {
+            CostType type = CostTypeConverter.fromView(typeView);
+            if (!service.existType(type)) {
+                service.saveType(type);
+                LOGGER.info("Запись о типе расхода: " + typeView.getName() + " произведена");
+                map.addAttribute("message", "Запись о типе расхода изменена");
+                return "success";
+            } else {
+                map.addAttribute("message", "Название типа расхода должно быть уникальным.");
+                response.setStatus(409);
+                return "error";
+            }
+        } catch (Exception e) {
+            map.addAttribute("message", "Ошибка по работе с БД!");
+            response.setStatus(409);
+            return "error";
+        }
+    }
 
     /**
      * Удаление расхода
@@ -180,17 +186,17 @@ public class CostController {
      * @param response ответ
      * @return сообщение о результате удаления расхода из базы
      */
-//    @PostMapping(value = "deleteCostType/{id}")
-//    public String deleteCostType(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
-//        try {
-//            service.deleteType(id);
-//            LOGGER.info("Тип расхода удален!");
-//            map.addAttribute("message", "Тип расхода удален!");
-//            return "success";
-//        } catch (DataAccessException e) {
-//            map.addAttribute("message", "Невозможно удалить тип расхода");
-//            response.setStatus(409);
-//            return "error";
-//        }
-//    }
+    @PostMapping(value = "deleteCostType/{id}")
+    public String deleteCostType(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
+        try {
+            service.deleteType(id);
+            LOGGER.info("Тип расхода удален!");
+            map.addAttribute("message", "Тип расхода удален!");
+            return "success";
+        } catch (DataAccessException e) {
+            map.addAttribute("message", "Невозможно удалить тип расхода");
+            response.setStatus(409);
+            return "error";
+        }
+    }
 }

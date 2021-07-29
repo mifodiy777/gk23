@@ -15,7 +15,7 @@ import java.util.Objects;
 public class CostView implements Serializable {
     private Integer id;
     private String typeName;
-    private String typeId;
+    private Integer typeId;
     private String description;
     private Long money;
     private String date;

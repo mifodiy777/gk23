@@ -1,7 +1,5 @@
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<script type="text/javascript" src="<c:url value="/js/typeahead.js"/>"></script>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<script type="text/javascript" th:src="@{/js/typeahead.js}"></script>
 <script type="text/javascript">
     $(document).ready(function () {
 
@@ -83,16 +81,16 @@
         <h4 class="panel-title">Режим добавления расходов</h4>
     </div>
     <div class="panel-body">
-        <form:form modelAttribute="cost" id="costForm" method="post" action="saveCost">
-            <form:hidden path="id"/>
+        <form id="costForm" action="#" th:action="@{/saveCost}" th:object="${cost}" method="post">
+            <input type="hidden" th:field="*{id}" id="id">
             <div class="divider"><h4> Расходная накладная: </h4></div>
             <div class="row">
                 <div class="col-md-3">
-                    <form:hidden path="type.id" id="typeId" cssClass="select-typehead"/>
+                    <input type="hidden" th:field="*{typeId}" id="typeId" class="select-typehead">
                     <div class="form-group">
                         <label for="typeName">Наименование*</label>
-                        <form:input path="type.name" id="typeName" placeholder="Найти"
-                                    cssClass="form-control typeahead"/>
+                        <input type="text" th:field="*{typeName}" id="typeName" placeholder="Найти"
+                               class="form-control typeahead"/>
                         <span class="help-block"></span>
                     </div>
                 </div>
@@ -104,7 +102,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="date">Дата*</label>
-                        <form:input path="date" id="date" cssClass="required form-control dateRU"/>
+                        <input type="text" th:field="*{date}" id="date" class="required form-control dateRU"/>
                         <span class="help-block"></span>
                     </div>
                 </div>
@@ -113,7 +111,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label for="date">Сумма/Руб*</label>
-                        <form:input path="money" id="money" cssClass="required digits form-control"/>
+                        <input type="text" th:field="*{money}" id="money" class="required digits form-control"/>
                         <span class="help-block"></span>
                     </div>
                 </div>
@@ -122,7 +120,7 @@
                 <div class="col-md-12">
                     <div class="form-group">
                         <label for="description">Дополнительная информация</label>
-                        <form:input path="description" id="description" cssClass="form-control"/>
+                        <input type="text" th:field="*{description}" id="description" class="form-control"/>
                     </div>
                 </div>
             </div>
@@ -135,7 +133,8 @@
                         class="btn btn-danger buttonForm"><span class="glyphicon glyphicon-remove"></span> Закрыть
                 </button>
             </div>
-        </form:form>
+        </form>
     </div>
 </div>
+</html>
 

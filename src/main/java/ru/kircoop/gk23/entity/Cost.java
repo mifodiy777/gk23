@@ -3,8 +3,6 @@ package ru.kircoop.gk23.entity;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.Objects;
 
 /**
@@ -17,7 +15,8 @@ public class Cost implements Serializable {
      * Идентификатор расхода
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cost_generator")
+    @SequenceGenerator(name="cost_generator", sequenceName = "cost_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 

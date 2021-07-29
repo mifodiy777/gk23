@@ -14,7 +14,8 @@ public class CostType implements Serializable {
      * Идентификатор типа расхода
      */
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cost_type_generator")
+    @SequenceGenerator(name="cost_type_generator", sequenceName = "cost_type_id_seq", allocationSize = 1)
     @Column(name = "id", nullable = false)
     private Integer id;
 

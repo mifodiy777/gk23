@@ -24,8 +24,13 @@ public class CostConverter {
         return dto;
     }
 
-    public static Cost fromView(CostView dto, CostType type) {
+    public static Cost fromView(CostView dto) {
         if (dto == null) return null;
+
+        CostType type = new CostType();
+        type.setId(dto.getTypeId());
+        type.setName(dto.getTypeName());
+
         Cost cost = new Cost();
         cost.setId(dto.getId());
         cost.setType(type);

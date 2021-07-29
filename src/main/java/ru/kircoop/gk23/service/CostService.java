@@ -47,7 +47,6 @@ public class CostService {
     @Transactional
     public Cost saveCost(Cost cost) throws DataAccessException {
         if (cost.getType().getId() != null) {
-            //detached
             cost.setType(typeDAO.findById(cost.getType().getId()).orElse(null));
         }
         costDAO.save(cost);
