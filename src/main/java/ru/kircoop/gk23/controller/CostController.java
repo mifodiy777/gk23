@@ -36,6 +36,9 @@ public class CostController {
     @Autowired
     private CostService service;
 
+    @Autowired
+    private CostConverter converter;
+
     /**
      * Страница с формой добавления расходов
      *
@@ -85,7 +88,7 @@ public class CostController {
      */
     @GetMapping(value = "getCosts")
     public ResponseEntity<String> getCosts() {
-        List<CostView> viewList = service.getAll().stream().map(CostConverter::map).collect(Collectors.toList());
+        List<CostView> viewList = service.getAll().stream().map(converter::map).collect(Collectors.toList());
         return ResponseUtils.convertListToJson(viewList);
     }
 

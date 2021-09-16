@@ -1,0 +1,9 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<div th:if="${persons != null and !persons.isEmpty()}">
+    <ul th:each="p: ${persons}">
+        <li><a id="${p.id}" class="choosePerson">${p.lastName} ${p.name} ${p.fatherName}</a></li>
+    </ul>
+</div>
+<div th:if="${persons == null and persons.isEmpty()}">
+    Не найдено...
+</div>

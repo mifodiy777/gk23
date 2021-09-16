@@ -51,6 +51,8 @@ public class GaragService {
         return garagDAO.save(garag);
     }
 
+    public List<Garag> getGaragOnPerson()
+
     /**
      * Метод сохранения гаража уже имеющегося в базе
      *
@@ -166,6 +168,10 @@ public class GaragService {
         if (searchPerson && deletePerson) {
             personService.delete(oldPersonId);
         }
+    }
+
+    public List<Garag> findByPersonId(Integer id) {
+        return garagDAO.findByPersonId(id);
     }
 }
 

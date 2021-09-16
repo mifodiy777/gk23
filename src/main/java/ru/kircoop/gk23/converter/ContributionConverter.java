@@ -1,11 +1,13 @@
 package ru.kircoop.gk23.converter;
 
+import org.springframework.stereotype.Service;
 import ru.kircoop.gk23.dto.ContributionView;
 import ru.kircoop.gk23.entity.Contribution;
 
+@Service
 public class ContributionConverter {
 
-    public static ContributionView map(Contribution contribution) {
+    public ContributionView map(Contribution contribution) {
         if (contribution == null) return null;
         ContributionView dto = new ContributionView();
         dto.setId(contribution.getId());
@@ -21,7 +23,7 @@ public class ContributionConverter {
         return dto;
     }
 
-    public static Contribution fromView(ContributionView contribution) {
+    public Contribution fromView(ContributionView contribution) {
         if (contribution == null) return null;
         Contribution entityContribute = new Contribution();
         entityContribute.setId(contribution.getId());

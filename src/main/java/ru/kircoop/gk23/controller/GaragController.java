@@ -51,6 +51,12 @@ public class GaragController {
     @Autowired
     private RentService rentService;
 
+    @Autowired
+    private GaragConverter garagConverter;
+
+    @Autowired
+    private RentConverter rentConverter;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(GaragController.class);
 
     /*
@@ -64,7 +70,7 @@ public class GaragController {
     @GetMapping(value = "/allGarag")
     public ResponseEntity<List<GaragView>> getGarag(@RequestParam("setSeries") String series) {
         List<GaragView> garags = garagService.findBySeries(series).stream()
-                .map(GaragConverter::map).collect(Collectors.toCollection(ArrayList::new));
+                .map(garagConverter::map).collect(Collectors.toCollection(ArrayList::new));
         return new ResponseEntity<>(garags, HttpStatus.OK);
     }
 
@@ -118,7 +124,7 @@ public class GaragController {
     @GetMapping(value = "garag")
     public String addGaragForm(Model map) {
         List<RentView> rents = rentService.getRents().stream()
-                .map(RentConverter::map).collect(Collectors.toCollection(ArrayList::new));
+                .map(rentConverter::map).collect(Collectors.toCollection(ArrayList::new));
         map.addAttribute("type", "Режим добавления гаража");
         map.addAttribute("isOldGarag", false); //создание гаража
         map.addAttribute("rents", rents); // список периодов системы //todo convert view
@@ -136,11 +142,11 @@ public class GaragController {
     @GetMapping(value = "garag/{id}")
     public String editGaragForm(@PathVariable("id") Integer id, Model map) {
         List<RentView> rents = rentService.getRents().stream()
-                .map(RentConverter::map).collect(Collectors.toCollection(ArrayList::new));
+                .map(rentConverter::map).collect(Collectors.toCollection(ArrayList::new));
         map.addAttribute("type", "Режим редактирования гаража");
         map.addAttribute("isOldGarag", true); //редактирование гаража
         map.addAttribute("rents", rents);
-        map.addAttribute("garag", GaragConverter.map(garagService.getGarag(id)));
+        map.addAttribute("garag", garagConverter.map(garagService.getGarag(id)));
         return "garag";
     }
 
@@ -153,7 +159,7 @@ public class GaragController {
      */
     @GetMapping(value = "changePerson/{id}")
     public String changePerson(@PathVariable("id") Integer id, Model map) {
-        GaragView garag = GaragConverter.map(garagService.getGarag(id));
+        GaragView garag = garagConverter.map(garagService.getGarag(id));
         map.addAttribute("garag", garag);
         map.addAttribute("person", garag.getPerson()); //для Spring формы требуется отдельная подгрузка аттрибута //todo может убрать?
         return "changePerson";

@@ -21,6 +21,9 @@ public class HistoryGaragController {
     @Autowired
     private GaragService garagService;
 
+    @Autowired
+    private GaragConverter garagConverter;
+
     /**
      * Информационно модальное окно с историей изменений владельцев гаража
      *
@@ -30,7 +33,7 @@ public class HistoryGaragController {
      */
     @GetMapping(value = "getHistoryGarag/{id}")
     public String historyModalGarag(@PathVariable("id") Integer id, Model map) {
-        map.addAttribute("garag", GaragConverter.map(garagService.getGarag(id)));
+        map.addAttribute("garag", garagConverter.map(garagService.getGarag(id)));
         return "historyGarag";
     }
 

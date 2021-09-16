@@ -20,6 +20,9 @@ public class RentController {
     @Autowired
     private RentService rentService;
 
+    @Autowired
+    private RentConverter converter;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RentController.class);
 
     /**
@@ -36,7 +39,7 @@ public class RentController {
                                 HttpServletResponse response) {
         if (rentService.checkRent(year)) {
             map.addAttribute("year", year);
-            map.addAttribute("rent", new Rent());
+            map.addAttribute("rent", new RentView());
             return "modalNewRent";
         } else {
             map.addAttribute("message", "Период текущего года существует");
@@ -54,7 +57,7 @@ public class RentController {
      */
     @PostMapping(value = "saveRent")
     public String saveRent(RentView rent, Model map) {
-        Rent entityRent = RentConverter.fromView(rent);
+        Rent entityRent = converter.fromView(rent);
         rentService.saveOrUpdate(entityRent);
         rentService.createNewPeriod(entityRent);
         LOGGER.info("Создан новый период-" + rent.getYearRent());

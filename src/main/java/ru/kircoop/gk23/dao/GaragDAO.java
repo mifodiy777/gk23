@@ -64,4 +64,10 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
     @Query("select distinct g from Garag g inner join g.person p where g.series = :series")
     List<Garag> findBySeriesAndPerson(@Param("series") String series);
 
+    @Query("select distinct g from Garag g where g.person")
+    List<Garag> findByPersonId(@Param("id") Integer id);
+
+
+
+
 }

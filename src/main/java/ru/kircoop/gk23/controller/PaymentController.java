@@ -3,11 +3,16 @@ package ru.kircoop.gk23.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import ru.kircoop.gk23.service.GaragService;
 import ru.kircoop.gk23.service.PaymentService;
 import ru.kircoop.gk23.service.RentService;
+
+import javax.servlet.http.HttpServletResponse;
 
 @Controller
 public class PaymentController {
@@ -23,20 +28,15 @@ public class PaymentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PaymentController.class);
 
-    /*@InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        binder.registerCustomEditor(Calendar.class, new CalendarCustomEditor());
-    }
-
-    *//**
+    /**
      * Страница с чеками определенного года
      *
      * @param year Год
      * @param map  ModelMap
      * @return страница payments.jsp
-     *//*
-    @RequestMapping(value = "paymentsPage", method = RequestMethod.GET)
-    public String getPaymentsPage(@RequestParam(required = false, value = "year") Integer year, ModelMap map) {
+     */
+    @GetMapping(value = "paymentsPage")
+    public String getPaymentsPage(@RequestParam(required = false, value = "year") Integer year, Model map) {
         try {
             map.addAttribute("setYear", (year == null) ? Calendar.getInstance().get(Calendar.YEAR) : year);
             map.addAttribute("years", paymentService.findYears());
@@ -48,13 +48,13 @@ public class PaymentController {
         }
     }
 
-    *//**
+    /**
      * Список всех платежей определенного года
      *
      * @param year Год
      * @return json список платежей
-     *//*
-    @RequestMapping(value = "payments", method = RequestMethod.GET)
+     */
+    @GetMapping(value = "payments")
     public ResponseEntity<String> getPayments(@RequestParam("setYear") Integer year) {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.excludeFieldsWithoutExposeAnnotation();
@@ -62,71 +62,71 @@ public class PaymentController {
         return Utils.convertListToJson(gsonBuilder, paymentService.findByYear(year));
     }
 
-    *//**
+    /**
      * Модальное окно платежа
      *
      * @param id   ID Гаража
      * @param type Тип платежа (основной/дополнительный)
      * @param map  ModelMap
      * @return modalPay.jsp
-     *//*
-    @RequestMapping(value = "payModal", method = RequestMethod.GET)
+     */
+    @GetMapping(value = "payModal")
     public String payModal(@RequestParam("idGarag") Integer id,
                            @RequestParam("type") String type,
-                           ModelMap map) {
+                           Model map) {
         map.addAttribute("type", type);
         map.addAttribute("payment", new Payment(garagService.getGarag(id)));
         return "modalPay";
     }
 
-    *//**
+    /**
      * Сохранение платежа
      *
      * @param payment Платеж
      * @param type    Тип платежа
      * @return номер проведенного платежа
-     *//*
-    @RequestMapping(value = "savePayment", method = RequestMethod.POST)
+     */
+    @PostMapping(value = "savePayment")
     @ResponseBody
     public Integer savePayment(Payment payment, @RequestParam("type") String type) {
         payment = paymentService.pay(payment, false, type);
-        logger.info("Оплата по гаражу:" + payment.getGarag().getName() + " произведена");
+        LOGGER.info("Оплата по гаражу:" + payment.getGarag().getName() + " произведена");
         return payment.getId();
     }
 
-    *//**
+    /**
      * Печать выбранного чека
      *
      * @param id  ID чека
      * @param map ModelMap
      * @return страница с печатной формой чека order.jsp
-     *//*
-    @RequestMapping(value = "printOrder/{id}", method = RequestMethod.GET)
-    public String printOrder(@PathVariable("id") Integer id, ModelMap map) {
+     */
+    @GetMapping(value = "printOrder/{id}")
+    public String printOrder(@PathVariable("id") Integer id, Model map) {
         map.addAttribute("pay", paymentService.getPayment(id));
         return "order";
     }
 
-    *//**
+    /**
      * Удаление платежа
      *
      * @param id       ID платежа
      * @param map      ModelMap
      * @param response ответ
      * @return сообщение о результате удаления платежа из базы
-     *//*
+     */
     @RequestMapping(value = "deletePayment/{id}", method = RequestMethod.POST)
-    public String deletePayment(@PathVariable("id") Integer id, ModelMap map, HttpServletResponse response) {
+    public String deletePayment(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
         try {
             String garag = paymentService.getPayment(id).getGarag().getName();
             paymentService.delete(id);
-            logger.info("Платеж к гаражу " + garag + " удален!");
-            map.put("message", "Платеж удален!");
+            LOGGER.info("Платеж к гаражу " + garag + " удален!");
+            map.addAttribute("message", "Платеж удален!");
             return "success";
         } catch (DataAccessException e) {
-            map.put("message", "Невозможно удалить платеж");
+            map.addAttribute("message", "Невозможно удалить платеж");
             response.setStatus(409);
             return "error";
         }
-    }*/
+    }
 }
