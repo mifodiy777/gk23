@@ -51,7 +51,9 @@ public class GaragService {
         return garagDAO.save(garag);
     }
 
-    public List<Garag> getGaragOnPerson()
+    public List<Garag> getGaragOnPerson() {
+        return null;
+    }
 
     /**
      * Метод сохранения гаража уже имеющегося в базе
@@ -119,7 +121,7 @@ public class GaragService {
      * @return Сумма долга
      */
     public Integer sumContribution(Garag garag) {
-        return customDAO.getSumContribution(garag.getId());
+        return customDAO.getSumContribution(garag.getId()) + garag.getOldContribute();
     }
 
     /**

@@ -2,13 +2,11 @@ package ru.kircoop.gk23.dto;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Objects;
 
 @Data
-public class ContributionView implements Serializable {
+public class ContributionView {
+
     private Integer id;
     private Integer year;
     private int contribute;
@@ -19,4 +17,5 @@ public class ContributionView implements Serializable {
     private LocalDate finesLastUpdate;
     private boolean benefitsOn;
     private boolean memberBoardOn;
+    private int sum;
 }

@@ -120,9 +120,9 @@ public class CostController {
     @PostMapping(value = "saveCost")
     public String saveCost(CostView dto, Model map, HttpServletResponse response) {
         try {
-            Cost cost = CostConverter.fromView(dto);
+            Cost cost = converter.fromView(dto);
             service.saveCost(cost);
-            LOGGER.info("Запись о расходе: " + cost.getType().getName() + " произведена");
+            LOGGER.info("Запись о расходе: " + dto.getTypeName() + " произведена");
             map.addAttribute("message", "Запись о расходе произведена");
             return "success";
         } catch (Exception e) {

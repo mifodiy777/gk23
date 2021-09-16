@@ -8,8 +8,8 @@ import ru.kircoop.gk23.entity.Contribution;
 import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.entity.Payment;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -80,6 +80,16 @@ public class PaymentService {
      * @param garag Гараж
      * @return список платежей
      */
+    public List<Payment> getPaymentOnGaragNotNullPay(Garag garag) {
+        return paymentDAO.getPaymentOnGaragNotNullPay(garag.getId());
+    }
+
+    /**
+     * Возвращает платежи для определенного гаража
+     *
+     * @param garag Гараж
+     * @return список платежей
+     */
     public List<Payment> getPaymentOnGarag(Garag garag) {
         return paymentDAO.getPaymentOnGarag(garag.getId());
     }
@@ -94,7 +104,7 @@ public class PaymentService {
      */
     @Transactional
     public Payment pay(Payment payment, Boolean isCreateNewPeriod, String type) {
-        Garag garag = garagService.getGarag(payment.getGarag().getId());
+        Garag garag = payment.getGarag();
         if (!isCreateNewPeriod) {
             setHeaderPay(payment, garag);
         }
@@ -138,7 +148,7 @@ public class PaymentService {
      */
     private void setHeaderPay(Payment payment, Garag garag) {
         if (payment.getDatePayment() == null) {
-            payment.setDatePayment(LocalDateTime.now());
+            payment.setDatePayment(LocalDate.now());
             payment.setYear(LocalDateTime.now().getYear());
         } else {
             payment.setYear(payment.getDatePayment().getYear());
@@ -180,6 +190,7 @@ public class PaymentService {
                 payment.setPay(payment.getPay() - oldContribute);
                 garag.setOldContribute(0);
             }
+            garagService.save(garag);
         }
     }
 

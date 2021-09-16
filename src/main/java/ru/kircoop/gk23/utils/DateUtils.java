@@ -6,6 +6,8 @@ public class DateUtils {
 
     public static final DateTimeFormatter DD_MM_YYYY_DOT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+    public static final DateTimeFormatter DD_MM_YYYY_WITH_TIME = DateTimeFormatter.ofPattern("dd.MM.yyyy hh:mm:ss");
+
     public static final DateTimeFormatter DD_MM_YYYY_SLASH = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
 }

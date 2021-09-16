@@ -8,11 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kircoop.gk23.converter.PaymentConverter;
+import ru.kircoop.gk23.dto.PaymentView;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
 import ru.kircoop.gk23.service.GaragService;
 import ru.kircoop.gk23.service.PaymentService;
-import ru.kircoop.gk23.service.RentService;
+import ru.kircoop.gk23.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Calendar;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class PaymentController {
@@ -21,7 +28,7 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @Autowired
-    private RentService rentService;
+    private PaymentConverter converter;
 
     @Autowired
     private GaragService garagService;
@@ -40,7 +47,6 @@ public class PaymentController {
         try {
             map.addAttribute("setYear", (year == null) ? Calendar.getInstance().get(Calendar.YEAR) : year);
             map.addAttribute("years", paymentService.findYears());
-            map.addAttribute("rents", rentService.getRents());
             return "payments";
         } catch (DataAccessException e) {
             map.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
@@ -56,10 +62,8 @@ public class PaymentController {
      */
     @GetMapping(value = "payments")
     public ResponseEntity<String> getPayments(@RequestParam("setYear") Integer year) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.excludeFieldsWithoutExposeAnnotation();
-        gsonBuilder.registerTypeAdapter(Payment.class, new PaymentAdapter());
-        return Utils.convertListToJson(gsonBuilder, paymentService.findByYear(year));
+        List<PaymentView> viewList = paymentService.findByYear(year).stream().map(converter::map).collect(Collectors.toList());
+        return ResponseUtils.convertListToJson(viewList);
     }
 
     /**
@@ -74,24 +78,42 @@ public class PaymentController {
     public String payModal(@RequestParam("idGarag") Integer id,
                            @RequestParam("type") String type,
                            Model map) {
+        PaymentView payment = new PaymentView();
+        payment.setGaragId(id);
+        map.addAttribute("garagName", garagService.getGarag(id).getFullName());
         map.addAttribute("type", type);
-        map.addAttribute("payment", new Payment(garagService.getGarag(id)));
+        map.addAttribute("payment", payment);
         return "modalPay";
     }
 
     /**
      * Сохранение платежа
      *
-     * @param payment Платеж
-     * @param type    Тип платежа
+     * @param paymentView Платеж
+     * @param type        Тип платежа
      * @return номер проведенного платежа
      */
     @PostMapping(value = "savePayment")
     @ResponseBody
-    public Integer savePayment(Payment payment, @RequestParam("type") String type) {
-        payment = paymentService.pay(payment, false, type);
-        LOGGER.info("Оплата по гаражу:" + payment.getGarag().getName() + " произведена");
-        return payment.getId();
+    public Integer savePayment(PaymentView paymentView, @RequestParam("type") String type, Model map, HttpServletResponse response) {
+        try {
+            Garag garag = garagService.getGarag(paymentView.getGaragId());
+            if (garag != null) {
+                Payment payment = converter.fromView(paymentView, garag);
+                payment = paymentService.pay(payment, false, type);
+                LOGGER.info("Оплата по гаражу:" + payment.getGarag().getName() + " произведена");
+                return payment.getId();
+            }
+            LOGGER.error("Не найден гараж по идентификатору {}", paymentView.getGaragId());
+            map.addAttribute("message", "Не найден гараж!");
+            response.setStatus(409);
+            return -1;
+        } catch (DataAccessException e) {
+            map.addAttribute("message", "Невозможно удалить платеж");
+            response.setStatus(409);
+            return -1;
+        }
+
     }
 
     /**
@@ -103,7 +125,7 @@ public class PaymentController {
      */
     @GetMapping(value = "printOrder/{id}")
     public String printOrder(@PathVariable("id") Integer id, Model map) {
-        map.addAttribute("pay", paymentService.getPayment(id));
+        map.addAttribute("pay", converter.map(paymentService.getPayment(id)));
         return "order";
     }
 
@@ -118,9 +140,7 @@ public class PaymentController {
     @RequestMapping(value = "deletePayment/{id}", method = RequestMethod.POST)
     public String deletePayment(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
         try {
-            String garag = paymentService.getPayment(id).getGarag().getName();
             paymentService.delete(id);
-            LOGGER.info("Платеж к гаражу " + garag + " удален!");
             map.addAttribute("message", "Платеж удален!");
             return "success";
         } catch (DataAccessException e) {

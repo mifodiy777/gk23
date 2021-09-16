@@ -176,7 +176,7 @@ public class PersonController {
      * @return Сообщение о результате удаления владельца
      */
     @PostMapping(value = "deletePerson/{id}")
-    public String deleteGarag(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
+    public String deletePersonFromGarag(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
         try {
             for (Garag garag : garagService.findByPersonId(id)) {
                 garag.setPerson(null);

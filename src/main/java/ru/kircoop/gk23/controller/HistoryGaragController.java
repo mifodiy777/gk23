@@ -2,15 +2,16 @@ package ru.kircoop.gk23.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import ru.kircoop.gk23.converter.GaragConverter;
+import ru.kircoop.gk23.converter.HistoryConverter;
+import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.service.GaragService;
 import ru.kircoop.gk23.service.HistoryGaragService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.stream.Collectors;
 
 @Controller
 public class HistoryGaragController {
@@ -22,7 +23,8 @@ public class HistoryGaragController {
     private GaragService garagService;
 
     @Autowired
-    private GaragConverter garagConverter;
+    private HistoryConverter historyConverter;
+
 
     /**
      * Информационно модальное окно с историей изменений владельцев гаража
@@ -33,7 +35,10 @@ public class HistoryGaragController {
      */
     @GetMapping(value = "getHistoryGarag/{id}")
     public String historyModalGarag(@PathVariable("id") Integer id, Model map) {
-        map.addAttribute("garag", garagConverter.map(garagService.getGarag(id)));
+        Garag garag = garagService.getGarag(id);
+        if (garag != null) {
+            map.addAttribute("history", garag.getHistoryGarags().stream().map(historyConverter::map).collect(Collectors.toList()));
+        }
         return "historyGarag";
     }
 

@@ -18,7 +18,16 @@ public interface PaymentDAO extends JpaRepository<Payment, Integer> {
      * @param id Идентификатор гаража
      * @return список платежей
      */
-    @Query("select p from Payment p where p.pay <> 0 and p.garag = :id ")
+    @Query("select p from Payment p where p.pay <> 0 and p.garag.id = :id order by p.datePayment DESC")
+    List<Payment> getPaymentOnGaragNotNullPay(@Param("id") Integer id);
+
+    /**
+     * Метод возвращает платежи для определенного гаража
+     *
+     * @param id Идентификатор гаража
+     * @return список платежей
+     */
+    @Query("select p from Payment p where p.garag.id = :id order by p.datePayment DESC")
     List<Payment> getPaymentOnGarag(@Param("id") Integer id);
 
     /**

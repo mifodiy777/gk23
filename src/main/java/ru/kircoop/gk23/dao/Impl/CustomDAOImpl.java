@@ -22,9 +22,8 @@ import java.util.List;
 @Repository
 public class CustomDAOImpl {
 
-    private static final String SUM_CONTRIBUTE = "SELECT (sum(c.contribute)+sum(c.cont_land)+sum(c.cont_target)+sum(c.fines))+g.old_contribute AS SUM " +
+    private static final String SUM_CONTRIBUTE = "SELECT (sum(c.contribute)+sum(c.cont_land)+sum(c.cont_target)+sum(c.fines)) AS SUM " +
             "FROM contribution c INNER JOIN garag_contributions gc ON gc.contributions_id_count=c.id_count " +
-            "INNER JOIN garag g ON gc.garag_id_garag=g.id_garag " +
             "WHERE gc.Garag_id_garag = :idGarag";
 
     private static final String FIND_GROUP_COST = "SELECT t.name as type,COUNT(c.id) as count, sum(c.money) as sum from cost c INNER join costtype t " +

@@ -1,0 +1,245 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $("#garagForm").validate({
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    success: function (html) {
+                        $(".cooperateTable").DataTable().ajax.reload(null, false);
+                        showSuccessMessage(html);
+                        closeForm();
+                        return false;
+                    },
+                    error: function (xhr) {
+                        if (xhr.status == 409) {
+                            showErrorMessage(xhr.responseText);
+                        }
+                    }
+                });
+            },
+            errorPlacement: function (error, element) {
+                validPlaceError(error, element);
+            },
+            success: function (label, element) {
+                validPlaceSuccess(label, element);
+            }
+        });
+
+        $('#garagForm input').tooltipster({
+            trigger: 'custom',
+            onlyOne: false,
+            position: 'top'
+        });
+
+        searchPerson();
+
+        $("#garagForm").submit(function (e) {
+            e.preventDefault();
+            $(this).valid();
+            return false;
+        });
+    });
+
+
+</script>
+<div class="panel panel-success">
+    <div class="panel-heading">
+        <h4 class="panel-title" th:text="${type}"></h4>
+    </div>
+    <div class="panel-body">
+        <form id="garagForm" th:action="@{/saveGarag}" th:object="${garag}" method="post">
+            <input type="hidden" th:field="*{id}" id="idGarag">
+            <div class="divider"><h4> Гараж: </h4></div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group input-group">
+                        <label for="series" class="input-group-addon">Ряд*</label>
+                        <input type="text" th:field="*{series}" id="series" class="required form-control"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group input-group">
+                        <label for="number" class="input-group-addon">Номер*</label>
+                        <input type="text" th:field="*{number}" id="number" class="required form-control"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group input-group">
+                        <label for="oldContribute" class="input-group-addon">Долг прошлых лет</label>
+                        <input type="text" th:field="*{oldContribute}" id="oldContribute" class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group input-group">
+                        <label for="additionalInformation" class="input-group-addon">Дополнительная информация</label>
+                        <input type="text" th:field="*{additionalInformation}" id="additionalInformation"
+                               class="form-control"/>
+                    </div>
+                </div>
+            </div>
+            <div id="addFormPersonDiv">
+                <div class="divider"><h4> Владелец: </h4></div>
+                <div class="row">
+                    <input type="hidden" th:field="*{person.id}" id="person.id" class="person">
+                    <div class="col-md-4">
+                        <div class="form-group input-group">
+                            <label for="lastName" class="input-group-addon">Фамилия*</label>
+                            <input type="text" th:field="*{person.lastName}" id="lastName"
+                                   class="required form-control person"/>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group input-group">
+                            <label for="name" class="input-group-addon">Имя*</label>
+                            <input type="text" th:field="*{person.name}" id="name"
+                                   class="required form-control person"/>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group input-group">
+                            <label for="fatherName" class="input-group-addon">Отчество*</label>
+                            <input type="text" th:field="*{person.fatherName}" id="fatherName"
+                                   class="required form-control person"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group input-group">
+                    <label for="telephone" class="input-group-addon">Телефон*</label>
+                    <input type="text" th:field="*{person.telephone}" id="telephone"
+                           class="required form-control person"/>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <label for="city" class="input-group-addon">Город</label>
+                            <input type="text" th:field="*{person.city}" id="city" class="form-control person"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <label for="street" class="input-group-addon">Улица</label>
+                            <input type="text" th:field="*{person.street}" id="street" class="form-control person"/>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <label for="home" class="input-group-addon">Дом</label>
+                            <input type="text" th:field="*{person.home}" id="home" class="form-control person"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <label for="apartment" class="input-group-addon">Квартира</label>
+                            <input type="text" th:field="*{person.apartment}" id="apartment"
+                                   class="form-control person"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <label for="benefits" class="input-group-addon">Пенсионное удостоверение или другие
+                                льготы</label>
+                            <input type="text" th:field="*{person.benefits}" id="benefits" class="form-control person"/>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group input-group">
+                            <input type="checkbox" th:field="*{person.memberBoard}" id="memberBoard"
+                                   class="form-control"
+                                   name="fancy-checkbox-success" autocomplete="off"/>
+                            <div class="[ btn-group ]">
+                                <label for="memberBoard" class="[ btn btn-info ]">
+                                    <span class="[ glyphicon glyphicon-ok ]"></span>
+                                    <span> </span>
+                                </label>
+                                <label for="memberBoard" class="[ btn btn-default ]">
+                                    Член правления
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="searchDivPerson">
+
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-primary" id="searchPersonBtn"><span
+                            class="glyphicon glyphicon-search"></span> Найти владельца
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div id="searchFormDiv" class="col-md-6" style=" display:none;">
+                        <div class="input-group" id="searchDiv">
+                            <label for="searchPerson">Владелец</label>
+
+                            <div>
+                                <input id="searchPerson" type="text" rel="tooltip"
+                                       data-original-title="Введите более 3 символов" onkeypress="hideTooltip();"
+                                       onclick="hideTooltip();" class="form-control"/>
+                                <button type="button" id="buttonSearch"
+                                        onclick="loadOwner($('#searchPerson').val());"
+                                        class="btn btn-warning buttonCheck">
+                                    <span class="glyphicon glyphicon-search"></span> Найти
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="personResults" class="col-md-6">
+
+                    </div>
+                </div>
+            </div>
+            <div th:if="${isOldGarag}" class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <h4 align="center">Внести старые долги</h4>
+
+                    <div class="form-group input-group">
+                        <label for="year_select" class="input-group-addon">Год</label>
+                        <select id="year_select" class="form-control">
+                            <option th:each="rent: ${rents}"
+                                    th:text="${rent.yearRent}"
+                                    th:value="${rent.yearRent}"></option>
+                        </select>
+                        <span class="input-group-btn">
+                        <button type="button" onclick="setOldContribute($('#idGarag').val(),$('#year_select').val())"
+                                class="btn btn-info">Внести
+                        </button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+            <div id="personBtn" style="text-align: center; margin-top:20px" class="col-md-12">
+                <button type="button" onclick="emptyGarag();"
+                        class="btn btn-info"><span class="glyphicon glyphicon-repeat"></span> Создать пустой
+                    гараж
+                </button>
+                <button type="button" onclick="resetPerson();"
+                        class="btn btn-info"><span class="glyphicon glyphicon-repeat"></span> Очистить форму
+                    владельца
+                </button>
+            </div>
+            <div style="text-align: center; margin-top:20px" class="col-md-12">
+                <button id="buttonAdd" class="btn btn-success buttonForm">
+                    <span class="glyphicon glyphicon-ok"></span> Сохранить
+                </button>
+
+                <button type="reset" onclick="closeForm('garag'); $('#addGaragButton').show();"
+                        class="btn btn-danger buttonForm"><span class="glyphicon glyphicon-remove"></span> Закрыть
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+

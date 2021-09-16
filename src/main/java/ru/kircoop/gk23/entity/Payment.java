@@ -2,7 +2,7 @@ package ru.kircoop.gk23.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import static ru.kircoop.gk23.utils.DateUtils.DD_MM_YYYY_DOT;
@@ -30,7 +30,7 @@ public class Payment implements Serializable {
     /*Дата платежа*/
     @Column(name = "date_payment", nullable = false)
     @OrderBy("datePayment DESC")
-    private LocalDateTime datePayment;
+    private LocalDate datePayment;
 
     //ФИО платильщика
     @Column(name = "person_fio", nullable = false)
@@ -103,11 +103,11 @@ public class Payment implements Serializable {
         this.year = year;
     }
 
-    public LocalDateTime getDatePayment() {
+    public LocalDate getDatePayment() {
         return datePayment;
     }
 
-    public void setDatePayment(LocalDateTime datePayment) {
+    public void setDatePayment(LocalDate datePayment) {
         this.datePayment = datePayment;
     }
 

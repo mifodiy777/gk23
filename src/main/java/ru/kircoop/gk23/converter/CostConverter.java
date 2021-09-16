@@ -1,9 +1,7 @@
 package ru.kircoop.gk23.converter;
 
 import org.springframework.stereotype.Service;
-import ru.kircoop.gk23.dto.ContributionView;
 import ru.kircoop.gk23.dto.CostView;
-import ru.kircoop.gk23.entity.Contribution;
 import ru.kircoop.gk23.entity.Cost;
 import ru.kircoop.gk23.entity.CostType;
 
@@ -28,8 +26,13 @@ public class CostConverter {
         return dto;
     }
 
-    public Cost fromView(CostView dto, CostType type) {
+    public Cost fromView(CostView dto) {
         if (dto == null) return null;
+
+        CostType type = new CostType();
+        type.setId(dto.getTypeId());
+        type.setName(dto.getTypeName());
+
         Cost cost = new Cost();
         cost.setId(dto.getId());
         cost.setType(type);

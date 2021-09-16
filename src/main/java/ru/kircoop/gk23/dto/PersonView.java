@@ -10,6 +10,7 @@ public class PersonView implements Serializable {
     private String name;
     private String lastName;
     private String fatherName;
+    private String fio;
     private String telephone;
     private String benefits;
     private Boolean memberBoard;
@@ -17,4 +18,5 @@ public class PersonView implements Serializable {
     private String street;
     private String home;
     private String apartment;
+    private String fullAddress;
 }

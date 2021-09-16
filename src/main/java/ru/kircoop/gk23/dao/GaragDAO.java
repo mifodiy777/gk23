@@ -28,7 +28,7 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
      *
      * @return список рядов
      */
-    @Query("select distinct g.series from Garag g")
+    @Query("select distinct g.series from Garag g order by g.series ASC")
     List<String> getSeries();
 
     /**
@@ -50,6 +50,7 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
 
     /**
      * Поиск гаражей по владельцу
+     *
      * @param p владелец
      * @return
      */
@@ -64,10 +65,7 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
     @Query("select distinct g from Garag g inner join g.person p where g.series = :series")
     List<Garag> findBySeriesAndPerson(@Param("series") String series);
 
-    @Query("select distinct g from Garag g where g.person")
+    @Query("select distinct g from Garag g where g.person.id = :id")
     List<Garag> findByPersonId(@Param("id") Integer id);
-
-
-
 
 }

@@ -85,11 +85,11 @@ function loadOwner(pattern) {
                     $("#name").val(person.name);
                     $("#fatherName").val(person.fatherName);
                     $("#telephone").val(person.telephone);
-                    $("#addressId").val(person.address.id);
-                    $("#city").val(person.address.city);
-                    $("#street").val(person.address.street);
-                    $("#home").val(person.address.home);
-                    $("#apartment").val(person.address.apartment);
+                    $("#addressId").val(person.id);
+                    $("#city").val(person.city);
+                    $("#street").val(person.street);
+                    $("#home").val(person.home);
+                    $("#apartment").val(person.apartment);
                     $("#benefits").val(person.benefits);
                     $("#memberBoard").prop("checked", person.memberBoard == true);
                     $("#personId").trigger("change");

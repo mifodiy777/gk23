@@ -1,0 +1,117 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<script th:inline="javascript">
+    $(document).ready(function () {
+
+        var year = [[${year}]];
+
+        $("#yearRent").val(year);
+        $('#formModalRent').modal({
+            backdrop: "static"
+        });
+        $("#rentForm").validate({
+            submitHandler: function (form) {
+                $(form).ajaxSubmit({
+                    success: function (html) {
+                        showSuccessMessage(html);
+                        $('#formModalRent').modal('hide');
+                    },
+                    error: function (xhr) {
+                        if (xhr.status == 409) {
+                            showErrorMessage(xhr.responseText);
+                            $('#formModalRent').modal('hide');
+                        }
+                    }
+                });
+            },
+            errorPlacement: function (error, element) {
+                validPlaceError(error, element);
+            },
+            success: function (label, element) {
+                validPlaceSuccess(label, element);
+            }
+        });
+
+        $('#formModalRent').on('hidden.bs.modal', function () {
+            $('form input').tooltipster('hide');
+        })
+
+        $('#rentForm input').tooltipster({
+            trigger: 'custom',
+            onlyOne: false,
+            position: 'top'
+        });
+
+        $('#submitNewRent').popConfirm({
+            title: "Сохранить период?",
+            content: "",
+            placement: "bottom",
+            yesBtn: "Да",
+            noBtn: "Нет"
+        });
+
+
+        $("#rentForm").submit(function (e) {
+            e.preventDefault();
+            $(this).valid();
+            return false;
+        });
+    })
+</script>
+
+<!-- Modal -->
+<div id="formModalRent" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title" th:text="'Введите суммы взносов за ' + ${year} +' год'"></h4>
+            </div>
+            <form id="rentForm" th:action="@{/saveRent}" th:object="${rent}" method="post">
+                <div class="modal-body">
+                    <input type="hidden" th:field="*{yearRent}" id="yearRent">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group input-group">
+                                <label for="contributeMax" class="input-group-addon">Взнос*</label>
+                                <input type="text" th:field="*{contributeMax}" id="contributeMax" class="required form-control"/>
+                                <span class="input-group-addon">руб.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group input-group">
+                                <label for="contLandMax" class="input-group-addon">За землю*</label>
+                                <input type="text" th:field="*{contLandMax}" id="contLandMax" class="required form-control"/>
+                                <span class="input-group-addon">руб.</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group input-group">
+                                <label for="contTargetMax" class="input-group-addon">Целевой взнос*</label>
+                                <input type="text" th:field="*{contTargetMax}" id="contTargetMax" class="required form-control"/>
+                                <span class="input-group-addon">руб.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer" align="center">
+                    <button type="submit" class="btn btn-success" id="submitNewRent"><span
+                            class="glyphicon glyphicon-ok"></span>
+                        Сохранить
+                    </button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">
+                        <span class="glyphicon glyphicon-remove"></span> Закрыть
+                    </button>
+
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>

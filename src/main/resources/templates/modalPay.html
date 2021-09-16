@@ -1,17 +1,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-
-<script type="text/javascript">
+<script th:inline="javascript">
     $(document).ready(function () {
+
+        var type = [[${type}]];
+        var garagId = [[${payment.garagId}]];
 
         $("#paymentForm").validate({
             submitHandler: function (form) {
                 $(form).ajaxSubmit({
                     data: {
-                        "type": "${type}"
+                        "type": type
                     },
                     success: function (id) {
-                        if ($("#informationPanel").length != 0 && $("#idGarag").val() == ${payment.garag.id}) {
-                            infGarag(${payment.garag.id});
+                        if ($("#informationPanel").length !== 0) {
+                            infGarag(garagId);
                         }
                         $('#formModalPay').modal('hide');
                         window.open('printOrder/' + id, '_blank');
@@ -76,17 +78,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title"><b>${payment.garag.fullName}</b></h4>
+                <h4 class="modal-title"><b th:text="${garagName}"></b></h4>
             </div>
-            <form:form modelAttribute="payment" id="paymentForm" method="post" action="savePayment">
+            <form id="paymentForm" th:action="@{/savePayment}" th:object="${payment}" method="post">
                 <div class="modal-body">
-                    <form:hidden path="garag.id" id="garag"/>
+                    <input type="hidden" th:field="*{garagId}" id="garag">
                     <div class="row">
                         <div class="col-md-10 col-md-offset-1">
                             <div class="form-group input-group">
                                 <label for="pay" class="input-group-addon">Cумма*</label>
-                                <form:input path="pay" id="pay"
-                                            cssClass="form-control"/>
+                                <input type="text" th:field="*{pay}" id="pay" class="form-control"/>
                                 <span class="input-group-addon"> руб.</span>
                             </div>
                         </div>
@@ -101,7 +102,7 @@
                             class="glyphicon glyphicon-remove"></span> Закрыть
                     </button>
                 </div>
-            </form:form>
+            </form>
         </div>
     </div>
 </div>

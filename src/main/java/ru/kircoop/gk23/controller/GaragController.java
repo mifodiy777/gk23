@@ -4,31 +4,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.kircoop.gk23.converter.GaragConverter;
-import ru.kircoop.gk23.converter.RentConverter;
-import ru.kircoop.gk23.dto.GaragView;
-import ru.kircoop.gk23.dto.RentView;
+import org.springframework.web.bind.annotation.*;
+import ru.kircoop.gk23.converter.*;
+import ru.kircoop.gk23.dto.*;
+import ru.kircoop.gk23.entity.Contribution;
 import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
 import ru.kircoop.gk23.entity.Person;
 import ru.kircoop.gk23.exception.ServiceException;
-import ru.kircoop.gk23.service.ContributionService;
-import ru.kircoop.gk23.service.GaragService;
-import ru.kircoop.gk23.service.PersonService;
-import ru.kircoop.gk23.service.RentService;
+import ru.kircoop.gk23.service.*;
+import ru.kircoop.gk23.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,10 +45,22 @@ public class GaragController {
     private RentService rentService;
 
     @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
     private GaragConverter garagConverter;
 
     @Autowired
     private RentConverter rentConverter;
+
+    @Autowired
+    private PersonConverter personConverter;
+
+    @Autowired
+    private ContributionConverter contributionConverter;
+
+    @Autowired
+    private PaymentConverter paymentConverter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GaragController.class);
 
@@ -68,10 +73,14 @@ public class GaragController {
      * @return JSON список гаражей
      */
     @GetMapping(value = "/allGarag")
-    public ResponseEntity<List<GaragView>> getGarag(@RequestParam("setSeries") String series) {
+    public ResponseEntity<String> getGarag(@RequestParam(required = false, value = "garag") Integer garag,
+                                           @RequestParam("setSeries") String series) {
+        if (garag != null) {
+            return ResponseUtils.convertListToJson(Collections.singletonList(garagConverter.map(garagService.getGarag(garag))));
+        }
         List<GaragView> garags = garagService.findBySeries(series).stream()
                 .map(garagConverter::map).collect(Collectors.toCollection(ArrayList::new));
-        return new ResponseEntity<>(garags, HttpStatus.OK);
+        return ResponseUtils.convertListToJson(garags);
     }
 
     /*
@@ -127,7 +136,7 @@ public class GaragController {
                 .map(rentConverter::map).collect(Collectors.toCollection(ArrayList::new));
         map.addAttribute("type", "Режим добавления гаража");
         map.addAttribute("isOldGarag", false); //создание гаража
-        map.addAttribute("rents", rents); // список периодов системы //todo convert view
+        map.addAttribute("rents", rents); // список периодов системы
         map.addAttribute("garag", new GaragView());
         return "garag";
     }
@@ -210,7 +219,16 @@ public class GaragController {
             response.setStatus(409);
             return "error";
         }
-        map.addAttribute("contributionAll", garagService.sumContribution(garag));
+        List<Contribution> contributionList = contributionService.getContributionByGarag(garag);
+        List<ContributionView> contributionViews = contributionList.stream()
+                .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new));
+        Contribution sumContribution = contributionService.getSumContribution(contributionList);
+        List<Payment> payments = paymentService.getPaymentOnGarag(garag);
+        List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
+        map.addAttribute("contributionsList", contributionViews);
+        map.addAttribute("contributionSum", contributionConverter.map(sumContribution));
+        map.addAttribute("total", sumContribution.getSumFixed() + sumContribution.getFines() + garag.getOldContribute());
+        map.addAttribute("payments", paymentViews);
         map.addAttribute("garag", garag);
         map.addAttribute("fio", garag.getPerson().getFIO());
         return "garagInf";
@@ -271,62 +289,45 @@ public class GaragController {
      */
     @PostMapping(value = "searchPerson")
     public String searchPerson(@RequestParam("pattern") String pattern, Model map) {
-        List<Person> persons = personService.findByfio(pattern);
+
+        List<PersonView> persons = personService.findByfio(pattern).stream()
+                .map(personConverter::map).collect(Collectors.toCollection(ArrayList::new));
         map.addAttribute("persons", persons);
         return "personRes";
     }
 
     /**
-     * Получение списка гаражей
-     *
-     * @param garag  ID Гаража, по умолчанию этого переходп нет.
-     *               Параметр появляется только после перехода в гаражи из списка владельцев
-     * @param series Ряд
-     * @return JSON список гаражей
-     */
-/*    @RequestMapping(value = "allGarag", method = RequestMethod.GET)
-    public ResponseEntity<String> getGarag(@RequestParam(required = false, value = "garag") Integer garag,
-                                           @RequestParam("setSeries") String series) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.excludeFieldsWithoutExposeAnnotation();
-        gsonBuilder.registerTypeAdapter(Person.class, new PersonAdapter());
-        if (garag != null) {
-            return Utils.convertObjectToJson(gsonBuilder, garagService.getGarag(garag));
-        }
-        return Utils.convertListToJson(gsonBuilder, garagService.findBySeries(series));
-    }
-
-    *//**
      * Определенный владелец в формате JSON
+     *
      * @param id ID Владельца
      * @return json - ответ, найденный владелец.
-     *//*
-    @RequestMapping(value = "getPerson", method = RequestMethod.GET)
-    public ResponseEntity<String> getPerson(@RequestParam("personId") Integer id) {
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.excludeFieldsWithoutExposeAnnotation();
-        return Utils.createJsonResponse(gsonBuilder, personService.getPerson(id));
+     */
+    @GetMapping(value = "getPerson")
+    public @ResponseBody
+    PersonView getPerson(@RequestParam("personId") Integer id) {
+        return personConverter.map(personService.getPerson(id));
     }
 
-    *//**
+    /**
      * Удаление гаража
-     * @param id ID Гаража
-     * @param map ModelMap
+     *
+     * @param id       ID Гаража
+     * @param map      ModelMap
      * @param response ответ
      * @return Сообщение о результате удаления гаража
-     *//*
+     */
     @RequestMapping(value = "deleteGarag/{id}", method = RequestMethod.POST)
-    public String deleteGarag(@PathVariable("id") Integer id, ModelMap map, HttpServletResponse response) {
+    public String deleteGarag(@PathVariable("id") Integer id, Model map, HttpServletResponse response) {
         try {
             Garag garag = garagService.getGarag(id);
             garagService.delete(id);
             LOGGER.info("Гараж " + garag.getName() + " удален!");
-            map.put("message", "Гараж удален!");
+            map.addAttribute("message", "Гараж удален!");
             return "success";
         } catch (DataAccessException e) {
-            map.put("message", "Невозможно удалить, так как гараж используется!");
+            map.addAttribute("message", "Невозможно удалить, так как гараж используется!");
             response.setStatus(409);
             return "error";
         }
-    }*/
+    }
 }

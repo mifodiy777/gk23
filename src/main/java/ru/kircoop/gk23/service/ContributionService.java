@@ -7,13 +7,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kircoop.gk23.dao.ContributionDAO;
 import ru.kircoop.gk23.dao.RentDAO;
+import ru.kircoop.gk23.dto.ContributionView;
 import ru.kircoop.gk23.entity.Contribution;
+import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.entity.Rent;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -151,5 +155,23 @@ public class ContributionService {
         }
         rentMax += rent.getContTargetMax();
         return rentMax;
+    }
+
+    public List<Contribution> getContributionByGarag(Garag garag) {
+        List<Contribution> list = garag.getContributions();
+        return list.stream()
+                .filter(c -> c.getSumFixed() + c.getFines() != 0)
+                .collect(Collectors.toList());
+    }
+
+    public Contribution getSumContribution(List<Contribution> contributionList) {
+        Contribution calculatSum = new Contribution();
+        for (Contribution c : contributionList){
+            calculatSum.setContribute(calculatSum.getContribute() + c.getContribute());
+            calculatSum.setContLand(calculatSum.getContLand() + c.getContLand());
+            calculatSum.setContTarget(calculatSum.getContTarget() + c.getContTarget());
+            calculatSum.setFines(calculatSum.getFines() + c.getFines());
+        }
+        return calculatSum;
     }
 }
