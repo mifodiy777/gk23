@@ -20,6 +20,7 @@ public class GaragConverter {
         dto.setId(garag.getId());
         dto.setSeries(garag.getSeries());
         dto.setNumber(garag.getNumber());
+        dto.setFullName(  garag.getFullName());
         dto.setPerson(converter.map(garag.getPerson()));
         dto.setOldContribute(garag.getOldContribute());
         dto.setAdditionalInformation(garag.getAdditionalInformation());

@@ -37,6 +37,10 @@ public class Payment implements Serializable {
     private String fio;
 
     //Сумма платежа
+    @Column(name = "total")
+    private int total;
+
+    //Контейнер денег для распределения
     @Column(name = "payment")
     private int pay;
 
@@ -121,6 +125,14 @@ public class Payment implements Serializable {
 
     public void setFio(String fio) {
         this.fio = fio;
+    }
+
+    public Integer getTotal() {
+        return total;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
     }
 
     public int getPay() {

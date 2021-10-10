@@ -7,7 +7,11 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.kircoop.gk23.converter.GaragConverter;
 import ru.kircoop.gk23.converter.PersonConverter;
 import ru.kircoop.gk23.dto.PersonView;
 import ru.kircoop.gk23.entity.Garag;
@@ -34,6 +38,9 @@ public class PersonController {
 
     @Autowired
     private PersonConverter converter;
+
+    @Autowired
+    private GaragConverter garagConverter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonController.class);
 
@@ -114,8 +121,8 @@ public class PersonController {
     /**
      * Сохранение владельца
      *
-     * @param person Владелец
-     * @param map    ModelMap
+     * @param personView Владелец
+     * @param map        ModelMap
      * @return Сообщение о результате сохранения владельца
      */
     @PostMapping(value = "savePerson")
@@ -138,6 +145,10 @@ public class PersonController {
     public String editPersonForm(@PathVariable("id") Integer id, Model map) {
         map.addAttribute("type", "Режим редактирования владельца");
         map.addAttribute("person", converter.map(personService.getPerson(id)));
+        List<Garag> garags = garagService.findByPersonId(id);
+        if (garags != null) {
+            map.addAttribute("garags", garags.stream().map(garagConverter::map).collect(Collectors.toList()));
+        }
         return "person";
     }
 

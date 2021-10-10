@@ -1,0 +1,15 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<header th:replace="header.html :: head"></header>
+<div th:replace="navbar.html :: div"></div>
+<div class="container">
+    <div class="text-center">
+        <div class="alert alert-danger" role="alert">
+            <h1>Произошла ошибка, свяжитесь с администратором системы.</h1>
+
+            <h3 th:text="${textError}"></h3>
+            <br>
+            <button class="btn btn-lg btn-primary" onclick="window.history.back();">Вернуться назад</button>
+        </div>
+    </div>
+</div>
+</html>

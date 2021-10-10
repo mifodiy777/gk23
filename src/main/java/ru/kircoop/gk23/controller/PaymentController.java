@@ -100,6 +100,7 @@ public class PaymentController {
             Garag garag = garagService.getGarag(paymentView.getGaragId());
             if (garag != null) {
                 Payment payment = converter.fromView(paymentView, garag);
+                payment.setTotal(payment.getPay());
                 payment = paymentService.pay(payment, false, type);
                 LOGGER.info("Оплата по гаражу:" + payment.getGarag().getName() + " произведена");
                 return payment.getId();

@@ -209,9 +209,9 @@ function deletePayment(id) {
     });
 }
 
-function deleteAssign(garag, id) {
-    $.post("deleteGaragInPerson", {idGarag: id}, function (html) {
-        $(garag).parent().parent().remove();
+function deleteAssign(element) {
+    $.post("deleteGaragInPerson", {idGarag: element.value}, function (html) {
+        $(element).parent().parent().remove();
         $(".cooperateTable").DataTable().ajax.reload(null, false);
         showSuccessMessage(html);
     });

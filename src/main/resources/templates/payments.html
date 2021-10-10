@@ -1,17 +1,10 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: KuzminKA
-  Date: 15.09.2015
-  Time: 19:31:40
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<jsp:include page="header.jsp"/>
-<script type="text/javascript">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<header th:replace="header.html :: head"></header>
+<div th:replace="navbar.html :: div"></div>
+<script th:inline="javascript">
 
     $(document).ready(function () {
-
+        var setYear = [[${setYear}]];
         $.scrollUp();
 
         var now = new Date();
@@ -24,7 +17,7 @@
             "ajax": {
                 url: "payments",
                 data: {
-                    setYear: "${setYear}"
+                    setYear: setYear
                 }
             },
             "fnDrawCallback": function () {
@@ -42,10 +35,10 @@
             },
             "columns": [
                 {"data": "number", 'title': 'Платеж', className: "series"},
-                {"data": "datePay", 'title': 'Дата', type: 'de_date', targets: 1, "searchable": false},
-                {"data": "garag", 'title': 'Гараж', "searchable": false},
+                {"data": "datePayment", 'title': 'Дата', type: 'de_date', targets: 1, "searchable": false},
+                {"data": "fullNameGarag", 'title': 'Гараж', "searchable": false},
                 {"data": "fio", 'title': 'ФИО'},
-                {"data": "pay", 'title': 'Сумма', className: "pay_style", "searchable": false},
+                {"data": "total", 'title': 'Сумма', className: "pay_style", "searchable": false},
                 {
                     'title': 'Действия',
                     className: "btnPayments",
@@ -65,30 +58,25 @@
 
 </script>
 <div class="container-fluid">
-    <input type="hidden" id="setYear" value="${setYear}">
+    <input type="hidden" id="setYear" th:value="${setYear}">
 
     <div class="panel with-nav-tabs panel-primary">
         <div class="panel-heading">
             <ul class="nav nav-tabs nav-justified">
-                <c:forEach items="${years}" var="year">
-                    <li role='presentation' <c:if test="${setYear eq year}">class="active"</c:if>>
-                        <a class="seriesLink"
-                           href="<c:url value="/paymentsPage">
-                        <c:param name="year" value="${year}"/></c:url>">
-                            <c:out value="${year}"/>
-                        </a>
-                    </li>
-                </c:forEach>
+                <li role='presentation' th:each="year: ${years}" th:classappend="${setYear == year} ? active : ''">
+                    <a class="seriesLink" th:href="@{/paymentsPage/{year}(year = ${year})}" th:text="${year}"> </a>
+                </li>
             </ul>
         </div>
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-3">
-                    <h3>Платежи ${setYear} года</h3>
+                    <h3 th:text="'Платежи ' + ${setYear} + ' года'"></h3>
                     Общее количество: <span id="count" class="badge"></span>
                 </div>
             </div>
             <table id="paymentTable" class="table table-striped table-bordered" cellspacing="0" width="100%"></table>
         </div>
     </div>
-    <jsp:include page="footer.jsp"/>
+</div>
+</html>

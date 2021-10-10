@@ -11,6 +11,8 @@ public class PaymentView {
     private Integer year;
     private String datePayment;
     private String fio;
+    private String fullNameGarag;
+    private int total;
     private int pay;
     private int contributePay;
     private int contLandPay;
@@ -19,8 +21,4 @@ public class PaymentView {
     private int additionallyPay;
     private int oldContributePay;
     private int debtPastPay;
-
-    public int getSumPay() {
-        return pay + contributePay + contLandPay + contTargetPay + additionallyPay + finesPay;
-    }
 }

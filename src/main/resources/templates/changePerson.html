@@ -1,13 +1,14 @@
-<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<script>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<header th:replace="header.html :: head"></header>
+<div th:replace="navbar.html :: div"></div>
+<script th:inline="javascript">
     $(document).ready(function () {
+
+        var garagId = [[${garag.id}]];
 
         $("#personForm").validate({
             submitHandler: function (form) {
-                promtReason(form, '${garag.id}');
+                promtReason(form, garagId);
             },
             errorPlacement: function (error, element) {
                 validPlaceError(error, element);
@@ -44,8 +45,8 @@
 </script>
 <div class="panel panel-success">
     <div class="panel-heading">
-        <h4 class="panel-title"> Смена владельца: ${garag.fullName}</h4>
-        <input type="hidden" id="idPastPerson" value="${person.id}">
+        <h4 class="panel-title" th:text="'Смена владельца: ' + ${person.fio}"></h4>
+        <input type="hidden" id="idPastPerson" th:value="${person.id}">
     </div>
     <div class="panel-body">
         <div class="center">
@@ -57,10 +58,10 @@
                 <input class="magic-radio" type="radio" name="changeGaragAll" id="oneChange" value="false"
                        checked="checked">
                 <label for="oneChange"> Сменить только у текущего гаража</label>
-                <c:if test="${fn:length(person.garagList)>1}">
+                <div th:if="${isManyGarag}">
                     <input class="magic-radio" type="radio" name="changeGaragAll" id="allChange" value="true">
                     <label for="allChange"> Сменить владельца у всех гаражей</label>
-                </c:if>
+                </div>
             </div>
             <div class="col-md-6 center">
                 <div id="deleteOwner" class="form-group input-group">
@@ -84,53 +85,53 @@
             <h4>Владелец</h4>
         </div>
         <div id="alertPanel" class="alert alert-info" role="alert" style="display:none; font-size:14pt"></div>
-        <form:form modelAttribute="person" id="personForm" method="post" action="change">
-            <form:hidden path="id" id="personId"/>
+        <form id="personForm" th:action="@{/change}" th:object="${person}" method="post">
+            <input type="hidden" th:field="*{id}" id="personId">
             <div id="addFormPersonDiv">
                 <div class="col-md-6">
                     <div class="form-group input-group">
                         <label for="lastName" class="input-group-addon">Фамилия*</label>
-                        <form:input path="lastName" id="lastName" cssClass="required form-control"/>
+                        <input type="text" th:field="*{lastName}" id="lastName" class="required form-control"/>
                     </div>
                     <div class="form-group input-group">
                         <label for="name" class="input-group-addon">Имя*</label>
-                        <form:input path="name" id="name" cssClass="required form-control"/>
+                        <input type="text" th:field="*{name}" id="name" class="required form-control"/>
+
                     </div>
                     <div class="form-group input-group">
                         <label for="fatherName" class="input-group-addon">Отчество*</label>
-                        <form:input path="fatherName" id="fatherName" cssClass="required form-control"/>
+                        <input type="text" th:field="*{fatherName}" id="fatherName" class="required form-control"/>
                     </div>
                     <div class="form-group input-group">
                         <label for="telephone" class="input-group-addon">Телефон*</label>
-                        <form:input path="telephone" id="telephone" cssClass="required form-control"/>
+                        <input type="text" th:field="*{telephone}" id="telephone" class="required form-control"/>
                     </div>
                     <div class=" form-group input-group">
                         <label for="benefits" class="input-group-addon">Пенсионно удостоверение</label>
-                        <form:input path="benefits" id="benefits" cssClass="form-control"/>
+                        <input type="text" th:field="*{benefits}" id="benefits" class="form-control"/>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <form:hidden path="address.id" id="addressId" cssClass="form-control"/>
                     <div class="form-group input-group">
                         <label for="city" class="input-group-addon">Город</label>
-                        <form:input path="address.city" id="city" cssClass="form-control"/>
+                        <input type="text" th:field="*{city}" id="city" class="form-control"/>
                     </div>
                     <div class="form-group input-group">
                         <label for="street" class="input-group-addon">Улица</label>
-                        <form:input path="address.street" id="street" cssClass="form-control"/>
+                        <input type="text" th:field="*{street}" id="street" class="form-control"/>
                     </div>
                     <div class="form-group input-group">
                         <label for="home" class="input-group-addon">Дом</label>
-                        <form:input path="address.home" id="home" cssClass="form-control"/>
+                        <input type="text" th:field="*{home}" id="home" class="form-control"/>
                     </div>
                     <div class="form-group input-group">
                         <label for="apartment" class="input-group-addon">Квартира</label>
-                        <form:input path="address.apartment" id="apartment" cssClass="form-control"/>
+                        <input type="text" th:field="*{apartment}" id="apartment" class="form-control"/>
                     </div>
                     <div class="form-group input-group">
-                        <form:checkbox path="memberBoard" id="memberBoard"
-                                       cssClass="form-control"
-                                       name="fancy-checkbox-success" autocomplete="off"/>
+                        <input type="checkbox" th:field="*{memberBoard}" id="memberBoard"
+                               class="form-control"
+                               name="fancy-checkbox-success" autocomplete="off"/>
                         <div class="[ btn-group ]">
                             <label for="memberBoard" class="[ btn btn-info ]">
                                 <span class="[ glyphicon glyphicon-ok ]"></span>
@@ -186,11 +187,9 @@
                 <button type="button" onclick="resetForm();" class="btn btn-default buttonForm">Очистить
                 </button>
             </div>
-        </form:form>
+        </form>
     </div>
 </div>
-
-
 <div class="modal fade" tabindex="-1" role="dialog" id="promtModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -217,6 +216,7 @@
         </div>
     </div>
 </div>
+</html>
 
 
 

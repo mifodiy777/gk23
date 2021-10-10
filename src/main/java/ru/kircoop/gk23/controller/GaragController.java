@@ -19,11 +19,13 @@ import ru.kircoop.gk23.service.*;
 import ru.kircoop.gk23.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.kircoop.gk23.utils.DateUtils.DD_MM_YYYY_WITH_TIME;
 
 /**
  * Контороллер по работе с гаражами
@@ -170,7 +172,13 @@ public class GaragController {
     public String changePerson(@PathVariable("id") Integer id, Model map) {
         GaragView garag = garagConverter.map(garagService.getGarag(id));
         map.addAttribute("garag", garag);
-        map.addAttribute("person", garag.getPerson()); //для Spring формы требуется отдельная подгрузка аттрибута //todo может убрать?
+        map.addAttribute("person", garag.getPerson());
+        boolean isManyGarag = false;
+        List<Garag> garags = garagService.findByPersonId(garag.getPerson().getId());
+        if (!garags.isEmpty() && garags.size() > 1) {
+            isManyGarag = true;
+        }
+        map.addAttribute("isManyGarag", isManyGarag);
         return "changePerson";
     }
 
@@ -220,15 +228,19 @@ public class GaragController {
             return "error";
         }
         List<Contribution> contributionList = contributionService.getContributionByGarag(garag);
-        List<ContributionView> contributionViews = contributionList.stream()
-                .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new));
-        Contribution sumContribution = contributionService.getSumContribution(contributionList);
+        if (contributionList != null) {
+            List<ContributionView> contributionViews = contributionList.stream()
+                    .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new));
+            Contribution sumContribution = contributionService.getSumContribution(contributionList);
+            map.addAttribute("contributionsList", contributionViews);
+            map.addAttribute("contributionSum", contributionConverter.map(sumContribution));
+            map.addAttribute("total", sumContribution.getSumFixed() + sumContribution.getFines() + garag.getOldContribute());
+        }
         List<Payment> payments = paymentService.getPaymentOnGarag(garag);
-        List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
-        map.addAttribute("contributionsList", contributionViews);
-        map.addAttribute("contributionSum", contributionConverter.map(sumContribution));
-        map.addAttribute("total", sumContribution.getSumFixed() + sumContribution.getFines() + garag.getOldContribute());
-        map.addAttribute("payments", paymentViews);
+        if (payments != null) {
+            List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
+            map.addAttribute("payments", paymentViews);
+        }
         map.addAttribute("garag", garag);
         map.addAttribute("fio", garag.getPerson().getFIO());
         return "garagInf";
@@ -245,9 +257,18 @@ public class GaragController {
     public String infGarag(@PathVariable("id") Integer id, Model map) {
         Garag garag = garagService.getGarag(id);
         map.addAttribute("contributionAll", garagService.sumContribution(garag));
-        map.addAttribute("garag", garag);
-        map.addAttribute("fio", garag.getPerson().getFIO());
-        map.addAttribute("now", Calendar.getInstance().getTime());
+        List<Contribution> contributions = contributionService.getContributionByGarag(garag);
+        if (contributions != null) {
+            map.addAttribute("contributions", contributions.stream()
+                    .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new)));
+        }
+        List<Payment> payments = paymentService.getPaymentOnGarag(garag);
+        if (payments != null) {
+            List<PaymentView> paymentViews = payments.stream().map(paymentConverter::map).collect(Collectors.toList());
+            map.addAttribute("payments", paymentViews);
+        }
+        map.addAttribute("garag", garagConverter.map(garag));
+        map.addAttribute("now", LocalDateTime.now().format(DD_MM_YYYY_WITH_TIME));
         return "infPrint";
     }
 

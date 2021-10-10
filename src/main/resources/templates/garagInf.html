@@ -68,7 +68,7 @@
             <tr th:each="p: ${payments}">
                 <td th:text="${p.datePayment}"></td>
                 <td th:text="${p.number}"></td>
-                <td th:text="${p.getSumPay()} + ' руб.'"></td>
+                <td th:text="${p.total} + ' руб.'"></td>
                 <td th:text="${p.contributePay} + ' руб.'"></td>
                 <td th:text="${p.contLandPay} + ' руб.'"></td>
                 <td th:text="${p.contTargetPay} + ' руб.'"></td>
