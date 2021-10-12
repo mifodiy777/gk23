@@ -18,6 +18,8 @@ public class PaymentConverter {
         PaymentView dto = new PaymentView();
         dto.setId(payment.getId());
         dto.setGaragId(payment.getGarag().getId());
+        dto.setGaragSeries(payment.getGarag().getSeries());
+        dto.setGaragNumber(payment.getGarag().getNumber());
         dto.setNumber(payment.getNumber());
         dto.setYear(payment.getYear());
         dto.setDatePayment(payment.getDatePayment().format(DD_MM_YYYY_DOT));

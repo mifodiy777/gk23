@@ -1,9 +1,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <script th:inline="javascript">
-    $(document).ready(function () {
+    var max = [[${max}]];
+    var contribution = [[${contribution}]];
 
-        var max = [[${max}]];
-        var contribution = [[${contribution}]];
+    $(document).ready(function () {
 
         $('#formModalContribute').modal({
             backdrop: "static"
@@ -58,7 +58,7 @@
                 $(".maxContribute").text("MAX 0 руб.");
             } else {
                 $("#memberBoardOnHide").val(max.contributeMax);
-                $(".maxContribute").text("MAX max.contributeMax руб.");
+                $(".maxContribute").text("MAX " + max.contributeMax + " руб.");
             }
         });
 
@@ -66,11 +66,11 @@
         $("#benefitsOn").on("click", function () {
             if ($("#benefitsOn:checked").val()) {
                 $("#benefitsOnHide").val(max.contLandMax / 2);
-                $(".maxLand").html("MAX ${max.contLandMax/2} руб.");
+                $(".maxLand").html("MAX " + max.contLandMax / 2 + " руб.");
 
             } else {
-                $("#benefitsOnHide").val(${max.contLandMax});
-                $(".maxLand").html("MAX ${max.contLandMax} руб.");
+                $("#benefitsOnHide").val(max.contLandMax);
+                $(".maxLand").html("MAX " + max.contLandMax + " руб.");
 
             }
         });
@@ -101,7 +101,7 @@
     })
 
     function setNextYear() {
-        $("#finesLastUpdate").val("01.01.${contribution.year+1}");
+        $("#finesLastUpdate").val("01.01." + (contribution.year + 1));
         $("#finesOn").prop("checked", true);
     }
 
@@ -113,7 +113,7 @@
         } else {
             $("#contLand").val(max.contLandMax);
         }
-        $("#finesLastUpdate").val("01.07.${contribution.year}");
+        $("#finesLastUpdate").val("01.07." + contribution.year);
         $("#finesOn").prop("checked", true);
         if ($("#memberBoardOn").prop("checked")) {
             $("#contribute").val(0);
@@ -129,80 +129,70 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Введите долг за ${contribution.year} год</h4>
-                <c:if test="${garag.person.memberBoard}"><span id="membersPerson" class="label label-warning">Член правления</span>
-                </c:if>
+                <h4 class="modal-title" th:text="'Введите долг за ' + ${contribution.year} +' год'"></h4>
+                <span id="membersPerson" class="label label-warning"
+                      th:if="${garag.person.memberBoard}">Член правления</span>
             </div>
-            <form:form modelAttribute="contribution" id="contributionForm" method="post" action="saveContribute">
+            <form id="contributionForm" th:action="@{/saveContribute}" th:object="${contribution}" method="post">
+                <input type="hidden" id="idGarag" name="idGarag" th:value="${garag.id}">
                 <div class="modal-body">
-                    <form:hidden path="id"/>
-                    <form:hidden path="year"/>
-                    <input type="hidden" id="idGarag" name="idGarag" value="${garag.id}">
-
+                    <input type="hidden" th:field="*{id}" id="id">
+                    <input type="hidden" th:field="*{year}" id="year">
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group input-group">
                                 <label for="contribute" class="input-group-addon">Членский взнос</label>
-                                <form:input path="contribute" id="contribute"
-                                            cssClass="number form-control maxContributeVal"/>
+                                <input type="text" th:field="*{contribute}" id="contribute"
+                                       class="number form-control maxContributeVal"/>
                                 <span class="input-group-addon">руб.</span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                        <span class="maxValueCont maxContribute">
-                            <c:choose>
-                                <c:when test="${garag.person.memberBoard}">MAX 0 руб.</c:when>
-                                <c:otherwise>MAX ${max.contributeMax} руб.</c:otherwise>
-                            </c:choose>
-                          </span>
+                            <span class="maxValueCont maxContribute"
+                                  th:text="${garag.person.memberBoard} ?
+                                   'MAX 0 руб.' : 'MAX ' + ${max.contributeMax} + ' руб.'">
+                            </span>
+                            <input type="hidden" id="memberBoardOnHide"
+                                   th:value="${garag.person.memberBoard} ? '0' : ${max.contributeMax}"/>
                         </div>
-                        <input type="hidden" id="memberBoardOnHide" value="
-                    <c:choose>
-                                <c:when test=" ${garag.person.memberBoard}">0</c:when>
-                        <c:otherwise>${max.contributeMax}</c:otherwise>
-                        </c:choose>">
                     </div>
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group input-group">
                                 <label for="contLand" class="input-group-addon">Аренда земли</label>
-                                <form:input path="contLand" id="contLand"
-                                            cssClass="number form-control maxLandVal"/>
+                                <input type="text" th:field="*{contLand}" id="contLand"
+                                       class="number form-control maxLandVal"/>
                                 <span class="input-group-addon">руб.</span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <span class="maxValueCont maxLand">MAX
-                                <c:choose>
-                                    <c:when test="${contribution.benefitsOn}">${max.contLandMax/2}</c:when>
-                                    <c:otherwise>${max.contLandMax}</c:otherwise>
-                                </c:choose> руб.</span>
+                            <span class="maxValueCont maxLand"
+                                  th:text="${contribution.benefitsOn} ?
+                                   'MAX ' + ${max.contLandMax/2} + ' руб.'
+                                   : 'MAX ' + ${max.contLandMax} + ' руб.'">
+                            </span>
                         </div>
-                        <input type="hidden" id="benefitsOnHide" value="
-                    <c:choose>
-                                    <c:when test=" ${contribution.benefitsOn}">${max.contLandMax/2}</c:when>
-                        <c:otherwise>${max.contLandMax}</c:otherwise>
-                        </c:choose>">
+                        <input type="hidden" id="benefitsOnHide"
+                               th:value="${contribution.benefitsOn} ? ${max.contLandMax/2} : ${max.contLandMax}">
                     </div>
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group input-group">
                                 <label for="contTarget" class="input-group-addon">Целевой взнос</label>
-                                <form:input path="contTarget" id="contTarget"
-                                            cssClass="number form-control"/>
+                                <input type="text" th:field="*{contTarget}" id="contTarget"
+                                       class="number form-control"/>
                                 <span class="input-group-addon">руб.</span>
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <span class="maxValueCont">MAX ${max.contTargetMax} руб.</span>
+                            <span class="maxValueCont" th:text="'MAX ' + ${max.contTargetMax} + ' руб.'"></span>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-md-8">
                             <div class="form-group input-group">
                                 <label for="fines" class="input-group-addon">Пени</label>
-                                <form:input path="fines" id="fines"
-                                            cssClass="number form-control"/>
+                                <input type="text" th:field="*{fines}" id="fines" class="number form-control"/>
                                 <span class="input-group-addon">руб.</span>
                             </div>
                         </div>
@@ -211,11 +201,9 @@
                         <div class="col-md-8">
                             <div class="form-group input-group">
                                 <label for="finesLastUpdate" class="input-group-addon">Дата обновления пеней</label>
-                                <form:input path="finesLastUpdate" id="finesLastUpdate"
-                                            cssClass="form-control dateRU"/>
-
+                                <input type="text" th:field="*{finesLastUpdate}" id="finesLastUpdate"
+                                       class=" dateRU form-control"/>
                             </div>
-
                         </div>
                         <div class="col-md-4">
                             <div class="input-group">
@@ -228,9 +216,9 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group input-group">
-                                <form:checkbox path="finesOn" id="finesOn"
-                                               cssClass="form-control"
-                                               name="fancy-checkbox-success" autocomplete="off"/>
+                                <input type="checkbox" th:field="*{finesOn}" id="finesOn"
+                                       class="form-control"
+                                       name="fancy-checkbox-success" autocomplete="off"/>
                                 <div class="[ btn-group ]">
                                     <label for="finesOn" class="[ btn btn-info ]">
                                         <span class="[ glyphicon glyphicon-ok ]"></span>
@@ -244,9 +232,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group input-group">
-                                <form:checkbox path="benefitsOn" id="benefitsOn"
-                                               cssClass="form-control"
-                                               name="fancy-checkbox-success" autocomplete="off"/>
+                                <input type="checkbox" th:field="*{benefitsOn}" id="benefitsOn"
+                                       class="form-control"
+                                       name="fancy-checkbox-success" autocomplete="off"/>
                                 <div class="[ btn-group ]">
                                     <label for="benefitsOn" class="[ btn btn-info ]">
                                         <span class="[ glyphicon glyphicon-ok ]"></span>
@@ -260,9 +248,9 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-group input-group">
-                                <form:checkbox path="memberBoardOn" id="memberBoardOn"
-                                               cssClass="form-control"
-                                               name="fancy-checkbox-success" autocomplete="off"/>
+                                <input type="checkbox" th:field="*{memberBoardOn}" id="memberBoardOn"
+                                       class="form-control"
+                                       name="fancy-checkbox-success" autocomplete="off"/>
                                 <div class="[ btn-group ]">
                                     <label for="memberBoardOn" class="[ btn btn-info ]">
                                         <span class="[ glyphicon glyphicon-ok ]"></span>
@@ -285,9 +273,9 @@
                         <button type="button" data-dismiss="modal" class="btn btn-default"><span
                                 class="glyphicon glyphicon-remove"></span> Закрыть
                         </button>
-
                     </div>
-            </form:form>
+                </div>
+            </form>
         </div>
 
     </div>

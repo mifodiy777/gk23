@@ -7,6 +7,8 @@ public class PaymentView {
 
     private Integer id;
     private Integer garagId;
+    private String garagSeries;
+    private String garagNumber;
     private Integer number;
     private Integer year;
     private String datePayment;
