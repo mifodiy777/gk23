@@ -49,12 +49,13 @@
                 {"data": "benefits", 'title': 'Льготы', "searchable": false},
                 {
                     "data": "garags", 'title': 'Гаражи', "searchable": false, "render": function (data, type, full) {
-                    var linkGarag = "";
-                    // data.forEach(function (item, i, arr) {
-                    //     linkGarag += "<a href='<c:url value="linkGarag"/>?id=" + item.garagId + "&series=" + item.series + "' title='Найти гараж'>" + item.garag + "</a><br>"
-                    // });
-                    return linkGarag;
-                }
+                        var linkGarag = "";
+                        var pathGarag = $('#pathGarag').attr('href');
+                        data.forEach(function (item, i, arr) {
+                            linkGarag += pathGarag + "?id=" + item.garagId + "&series=" + item.series + "' title='Найти гараж'>" + item.garag + "</a><br>"
+                        });
+                        return linkGarag;
+                    }
                 },
                 {
                     'title': 'Удалить',
@@ -96,6 +97,7 @@
 
 </script>
 <div class="container-fluid">
+    <input type="hidden" th:href="@{/linkGarag}" id="pathGarag">
     <button class="btn btn-success addBtn pull-left" onclick="saveEntity('person')">
         <span class="glyphicon glyphicon-plus"></span> Добавить владельца
     </button>
