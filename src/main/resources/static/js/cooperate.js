@@ -175,6 +175,17 @@ function closeForm() {
     $("tr.info").removeClass("info");
 }
 
+function infoGarags(id){
+    $("#formPanel").empty();
+    $.get("linkGarags", {"id": id}, function (html) {
+        $("#formPanel").html(html);
+    }).fail(function (xhr) {
+        if (xhr.status == 409) {
+            showErrorMessage(xhr.responseText);
+        }
+    })
+}
+
 function deleteEntity(id, entity) {
     $.ajax({
         url: entity + "/" + id,

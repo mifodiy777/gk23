@@ -105,21 +105,21 @@ public class GaragController {
     }
 
     /**
-     * Переход со страницы Владельцев к определенному гаражу
+     * Переход со страницы Владельцев к гаражам
      *
-     * @param id     ID гаража
-     * @param series ряд гаража
+     * @param personId     ID владельца
      * @param model  Model
-     * @return garags.jsp
+     * @return listGaragInf.jsp
      */
-    @GetMapping(value = "linkGarag")
-    public String linkGarag(@RequestParam("id") Integer id, @RequestParam("series") String series,
+    @GetMapping(value = "linkGarags")
+    public String linkGarag(@RequestParam("id") Integer personId,
                             Model model) {
-        model.addAttribute("setSeries", series);// ряд
         try {
-            model.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
-            model.addAttribute("garagId", id); // id выбранного гаража
-            return "garags";
+            List<Garag> garags = garagService.findByPersonId(personId);
+            if (garags != null) {
+                model.addAttribute("garags", garags.stream().map(garagConverter::map).collect(Collectors.toList()));
+            }
+            return "listGaragInf";
         } catch (DataAccessException e) {
             model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";

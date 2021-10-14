@@ -48,13 +48,9 @@
                 {"data": "fullAddress", 'title': 'Адрес', "searchable": false},
                 {"data": "benefits", 'title': 'Льготы', "searchable": false},
                 {
-                    "data": "garags", 'title': 'Гаражи', "searchable": false, "render": function (data, type, full) {
-                        var linkGarag = "";
-                        var pathGarag = $('#pathGarag').attr('href');
-                        data.forEach(function (item, i, arr) {
-                            linkGarag += pathGarag + "?id=" + item.garagId + "&series=" + item.series + "' title='Найти гараж'>" + item.garag + "</a><br>"
-                        });
-                        return linkGarag;
+                    "data": "garags", 'title': 'Гаражи', "searchable": false,  "render": function (data, type, full) {
+                        return "<a href=\"#\" class=\"btn btn-info btn-sm\" data-placement=\"top\" id=\"infoPerson_" + full.id +
+                            '" onclick="infoGarags(' + full.id + ');\"><span class="glyphicon glyphicon-bitcoin"/></span></a>'
                     }
                 },
                 {
@@ -97,7 +93,6 @@
 
 </script>
 <div class="container-fluid">
-    <input type="hidden" th:href="@{/linkGarag}" id="pathGarag">
     <button class="btn btn-success addBtn pull-left" onclick="saveEntity('person')">
         <span class="glyphicon glyphicon-plus"></span> Добавить владельца
     </button>
