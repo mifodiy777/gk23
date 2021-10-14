@@ -107,21 +107,53 @@ public class GaragController {
     /**
      * Переход со страницы Владельцев к гаражам
      *
-     * @param personId     ID владельца
-     * @param model  Model
+     * @param personId ID владельца
+     * @param map      Model
      * @return listGaragInf.jsp
      */
     @GetMapping(value = "linkGarags")
     public String linkGarag(@RequestParam("id") Integer personId,
-                            Model model) {
+                            @RequestParam(value = "garagId", required = false) Integer garagId,
+                            Model map, HttpServletResponse response) {
         try {
             List<Garag> garags = garagService.findByPersonId(personId);
             if (garags != null) {
-                model.addAttribute("garags", garags.stream().map(garagConverter::map).collect(Collectors.toList()));
+                map.addAttribute("listGarag", garags.stream().map(garagConverter::map).collect(Collectors.toList()));
+                Garag garag = garags.stream()
+                        .filter(g -> garagId == null || garagId.equals(g.getId())).findFirst().orElse(null);
+                if (garag == null) {
+                    map.addAttribute("message", "Не найден гараж у владельца!");
+                    response.setStatus(409);
+                    return "error";
+                }
+                if (garag.getContributions().isEmpty()) {
+                    map.addAttribute("message", "У гаража отсутствуют периоды начислений.\n Добавте их в меню редактирования гаража!");
+                    response.setStatus(409);
+                    return "error";
+                }
+                List<Contribution> contributionList = garag.getContributions();
+                if (contributionList != null) {
+                    List<ContributionView> contributionViews = contributionList.stream()
+                            .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new));
+                    Contribution sumContribution = contributionService.getSumContribution(contributionList);
+                    map.addAttribute("contributionsList", contributionViews);
+                    map.addAttribute("contributionSum", contributionConverter.map(sumContribution));
+                    map.addAttribute("total", sumContribution.getSumFixed() + sumContribution.getFines() + garag.getOldContribute());
+                }
+                List<Payment> payments = paymentService.getPaymentOnGarag(garag);
+                if (payments != null) {
+                    List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
+                    map.addAttribute("payments", paymentViews);
+                }
+                map.addAttribute("garag", garagConverter.map(garag));
+                map.addAttribute("fio", garag.getPerson().getFIO());
+            } else {
+                map.addAttribute("textError", "У владельца нет гаражей!");
+                return "errorPage";
             }
             return "listGaragInf";
         } catch (DataAccessException e) {
-            model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
+            map.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");
             return "errorPage";
         }
     }
@@ -241,7 +273,7 @@ public class GaragController {
             List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
             map.addAttribute("payments", paymentViews);
         }
-        map.addAttribute("garag", garag);
+        map.addAttribute("garag", garagConverter.map(garag));
         map.addAttribute("fio", garag.getPerson().getFIO());
         return "garagInf";
     }

@@ -21,7 +21,9 @@ import ru.kircoop.gk23.service.PersonService;
 import ru.kircoop.gk23.utils.ResponseUtils;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,19 +66,6 @@ public class PersonController {
     @GetMapping(value = "allPerson")
     public ResponseEntity<String> getPersons(@RequestParam("fio") String fio) {
         List<PersonView> persons = personService.getPersons(fio).stream()
-                .map(converter::map)
-                .collect(Collectors.toList());
-        return ResponseUtils.convertListToJson(persons);
-    }
-
-    /**
-     * Получение владельцев без гаража
-     *
-     * @return JSON список владельцев
-     */
-    @GetMapping(value = "emptyPersons")
-    public ResponseEntity<String> getEmptyPersons() {
-        List<PersonView> persons = personService.getEmptyPersons().stream()
                 .map(converter::map)
                 .collect(Collectors.toList());
         return ResponseUtils.convertListToJson(persons);

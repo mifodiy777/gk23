@@ -3,6 +3,7 @@ package ru.kircoop.gk23.dto;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 @Data
 public class GaragView implements Serializable {
@@ -13,6 +14,7 @@ public class GaragView implements Serializable {
     private PersonView person;
     private String additionalInformation;
     private int oldContribute;
+    private List<HistoryView> historyViewList;
 
 
 }

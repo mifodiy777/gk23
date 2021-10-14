@@ -56,14 +56,6 @@ public class PersonService {
     }
 
     /**
-     * Получить список владельцев не имеющих гаражей в кооперативе
-     * @return
-     */
-    public List<Person> getEmptyPersons() {
-        return customDAO.findPersonWithoutGarag();
-    }
-
-    /**
      * Получение списка членов правления
      *
      * @return список членов правления

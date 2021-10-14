@@ -33,8 +33,6 @@ public class CustomDAOImpl {
 
     private static final String DELETE_TYPE = "delete from costtype where id = :id";
 
-    private static final String PERSON_WITHOUT_GARAG = "SELECT * FROM Person p LEFT JOIN Garag g ON g.id_person = p.id_person WHERE g.id_person IS NULL";
-
     @PersistenceContext
     private EntityManager em;
 
@@ -46,15 +44,6 @@ public class CustomDAOImpl {
      */
     public Integer getSumContribution(Integer id) {
         return Integer.valueOf(em.createNativeQuery(SUM_CONTRIBUTE).setParameter("idGarag", id).getSingleResult().toString());
-    }
-
-    /**
-     * Список членов без гаража
-     *
-     * @return список владельцев
-     */
-   public List<Person> findPersonWithoutGarag() {
-        return (List<Person>) em.createNativeQuery(PERSON_WITHOUT_GARAG).getResultList();
     }
 
     /**

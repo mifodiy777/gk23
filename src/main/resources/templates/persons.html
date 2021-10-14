@@ -49,8 +49,8 @@
                 {"data": "benefits", 'title': 'Льготы', "searchable": false},
                 {
                     "data": "garags", 'title': 'Гаражи', "searchable": false,  "render": function (data, type, full) {
-                        return "<a href=\"#\" class=\"btn btn-info btn-sm\" data-placement=\"top\" id=\"infoPerson_" + full.id +
-                            '" onclick="infoGarags(' + full.id + ');\"><span class="glyphicon glyphicon-bitcoin"/></span></a>'
+                        return "<a href=\"#\" class=\"btn btn-info\" data-placement=\"top\" id=\"infoPerson_" + full.id +
+                            '" onclick="infoGarags(' + full.id + ');\">Информация</a>'
                     }
                 },
                 {
@@ -78,25 +78,11 @@
 
     });
 
-    function emptyPerson() {
-        var table = $('.cooperateTable').DataTable();
-        var btn = $('#emptyPerson');
-        if (btn.text() === 'Показать без гаражей') {
-            btn.html('Показать всех');
-            table.ajax.url("emptyPersons").load();
-        } else {
-            btn.html('Показать без гаражей');
-            table.ajax.url("allPerson").load();
-        }
-    }
-
-
 </script>
 <div class="container-fluid">
     <button class="btn btn-success addBtn pull-left" onclick="saveEntity('person')">
         <span class="glyphicon glyphicon-plus"></span> Добавить владельца
     </button>
-    <button id="emptyPerson" class="btn btn-warning pull-right" onclick="emptyPerson()">Показать без гаражей</button>
     <div class="clearfix"></div>
     <div id="formPanel"></div>
     <div class="panel panel-primary">

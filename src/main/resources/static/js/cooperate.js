@@ -175,9 +175,10 @@ function closeForm() {
     $("tr.info").removeClass("info");
 }
 
-function infoGarags(id){
+function infoGarags(id, garagId) {
     $("#formPanel").empty();
-    $.get("linkGarags", {"id": id}, function (html) {
+    console.log({"id": id, "garagId": garagId})
+    $.get("linkGarags", {"id": id, "garagId": garagId}, function (html) {
         $("#formPanel").html(html);
     }).fail(function (xhr) {
         if (xhr.status == 409) {
@@ -269,6 +270,7 @@ function changePerson(idGarag) {
     initTR(idGarag);
     $(".addBtn").hide();
 }
+
 function openPage(href) {
     location.href = href;
 }

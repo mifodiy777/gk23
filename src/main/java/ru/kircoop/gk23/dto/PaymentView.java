@@ -15,7 +15,7 @@ public class PaymentView {
     private String fio;
     private String fullNameGarag;
     private int total;
-    private int pay;
+    private Integer pay;
     private int contributePay;
     private int contLandPay;
     private int contTargetPay;

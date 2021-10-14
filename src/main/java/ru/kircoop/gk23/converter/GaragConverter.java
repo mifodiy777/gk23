@@ -5,6 +5,10 @@ import org.springframework.stereotype.Service;
 import ru.kircoop.gk23.dto.GaragView;
 import ru.kircoop.gk23.entity.Garag;
 
+import java.util.ArrayList;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 /**
  * Конвертер Garag
  */
@@ -13,6 +17,9 @@ public class GaragConverter {
 
     @Autowired
     private PersonConverter converter;
+
+    @Autowired
+    private HistoryConverter historyConverter;
 
     public GaragView map(Garag garag) {
         if (garag == null) return null;
@@ -24,6 +31,11 @@ public class GaragConverter {
         dto.setPerson(converter.map(garag.getPerson()));
         dto.setOldContribute(garag.getOldContribute());
         dto.setAdditionalInformation(garag.getAdditionalInformation());
+        dto.setHistoryViewList(Optional.ofNullable(garag.getHistoryGarags())
+                .orElse(new ArrayList<>())
+                .stream()
+                .map(historyConverter::map)
+                .collect(Collectors.toList()));
         return dto;
     }
 }
