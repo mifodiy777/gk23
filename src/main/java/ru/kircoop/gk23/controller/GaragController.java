@@ -241,43 +241,6 @@ public class GaragController {
         return "success";
     }
 
-
-    //Информационно модальное окно для гаража
-
-    /**
-     * Информационное окно для гаража - платежи, долги.
-     *
-     * @param id  ID Гаража
-     * @param map ModelMap
-     * @return garagInf.jsp
-     */
-    @GetMapping(value = "garagInf")
-    public String payModal(@RequestParam("idGarag") Integer id, Model map, HttpServletResponse response) {
-        Garag garag = garagService.getGarag(id);
-        if (garag.getContributions().isEmpty()) {
-            map.addAttribute("message", "У гаража отсутствуют периоды начислений.\n Добавте их в меню редактирования гаража!");
-            response.setStatus(409);
-            return "error";
-        }
-        List<Contribution> contributionList = contributionService.getContributionByGarag(garag);
-        if (contributionList != null) {
-            List<ContributionView> contributionViews = contributionList.stream()
-                    .map(contributionConverter::map).collect(Collectors.toCollection(ArrayList::new));
-            Contribution sumContribution = contributionService.getSumContribution(contributionList);
-            map.addAttribute("contributionsList", contributionViews);
-            map.addAttribute("contributionSum", contributionConverter.map(sumContribution));
-            map.addAttribute("total", sumContribution.getSumFixed() + sumContribution.getFines() + garag.getOldContribute());
-        }
-        List<Payment> payments = paymentService.getPaymentOnGarag(garag);
-        if (payments != null) {
-            List<PaymentView> paymentViews = payments.stream().limit(10).map(paymentConverter::map).collect(Collectors.toList());
-            map.addAttribute("payments", paymentViews);
-        }
-        map.addAttribute("garag", garagConverter.map(garag));
-        map.addAttribute("fio", garag.getPerson().getFIO());
-        return "garagInf";
-    }
-
     /**
      * Печатная форма информации по гаражу - платежи, долги.
      *

@@ -130,18 +130,6 @@ function setOldContribute(id, year) {
     });
 }
 
-function infGarag(id) {
-    $("#formPanel").empty();
-    $.get("garagInf", {"idGarag": id}, function (html) {
-        $("#formPanel").html(html);
-        initTR(id);
-    }).fail(function (xhr) {
-        if (xhr.status == 409) {
-            showErrorMessage(xhr.responseText);
-        }
-    })
-}
-
 function payGarag(id, type) {
     $.get("payModal", {"idGarag": id, "type": type}, function (html) {
         $("#modalDiv").html(html);
@@ -177,7 +165,6 @@ function closeForm() {
 
 function infoGarags(id, garagId) {
     $("#formPanel").empty();
-    console.log({"id": id, "garagId": garagId})
     $.get("linkGarags", {"id": id, "garagId": garagId}, function (html) {
         $("#formPanel").html(html);
     }).fail(function (xhr) {
@@ -218,14 +205,6 @@ function deletePayment(id) {
                 showErrorMessage(xhr.responseText);
             }
         }
-    });
-}
-
-function deleteAssign(element) {
-    $.post("deleteGaragInPerson", {idGarag: element.value}, function (html) {
-        $(element).parent().parent().remove();
-        $(".cooperateTable").DataTable().ajax.reload(null, false);
-        showSuccessMessage(html);
     });
 }
 

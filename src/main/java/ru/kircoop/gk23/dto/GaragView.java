@@ -15,6 +15,4 @@ public class GaragView implements Serializable {
     private String additionalInformation;
     private int oldContribute;
     private List<HistoryView> historyViewList;
-
-
 }

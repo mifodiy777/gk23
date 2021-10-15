@@ -80,7 +80,9 @@ public class PaymentController {
                            Model map) {
         PaymentView payment = new PaymentView();
         payment.setGaragId(id);
-        map.addAttribute("garagName", garagService.getGarag(id).getFullName());
+        Garag garag = garagService.getGarag(id);
+        map.addAttribute("garagName", garag.getFullName());
+        map.addAttribute("personId", garag.getPerson().getId());
         map.addAttribute("type", type);
         map.addAttribute("payment", payment);
         return "modalPay";

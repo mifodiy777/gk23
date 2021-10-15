@@ -141,32 +141,6 @@ public class PersonController {
         return "person";
     }
 
-
-    /**
-     * Удаление назначения к гаражу из режима редактирования владельца
-     *
-     * @param idGarag  ID Гаража
-     * @param map      ModelMap
-     * @param response ответ
-     * @return Сообщение о результате удаления назначения к гаражу
-     */
-    @PostMapping(value = "deleteGaragInPerson")
-    public String deletePerson(@RequestParam("idGarag") Integer idGarag,
-                               Model map, HttpServletResponse response) {
-        try {
-            Garag garag = garagService.getGarag(idGarag);
-            garag.setPerson(null);
-            garagService.save(garag);
-            LOGGER.info("Удален гараж у владельца(" + garag.getName() + ")");
-            map.addAttribute("message", "Назначение удаленно!");
-            return "success";
-        } catch (DataAccessException e) {
-            map.addAttribute("message", "Невозможно удалить, так как гараж используется!");
-            response.setStatus(409);
-            return "error";
-        }
-    }
-
     /**
      * Удаление владельца
      *

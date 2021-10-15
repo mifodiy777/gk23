@@ -70,7 +70,7 @@
                                 '" onclick="deleteEntity(' + full.id + ',\'deleteGarag\');"><span class="glyphicon glyphicon-trash"/></span></a>'
                             var actionsBtn = "";
                             if (full.person != null) {
-                                actionsBtn = "<a href=\"#\" class=\"btnTable btn btn-info btn-sm\" title='Информация' onclick=\"infGarag(" + full.id +
+                                actionsBtn = "<a href=\"#\" class=\"btnTable btn btn-info btn-sm\" title='Информация' onclick=\"infoGarags(" + full.person.id + "," + full.id +
                                     ");\"><span class=\"glyphicon glyphicon-comment\"/></span></a>" +
                                     "<a href=\"#\" class=\"btnTable btn btn-primary btn-sm\"  title=\"Сменить владельца\" data-placement=\"top\" onclick=\"initTR(" + full.id + ");changePerson(" + full.id + "," + full.person.id +
                                     ');"><span class=\"glyphicon glyphicon-transfer\"/></span></a>';
@@ -98,7 +98,8 @@
     <div class="panel with-nav-tabs panel-primary">
         <div class="panel-heading">
             <ul class="nav nav-tabs nav-justified">
-                <li th:each="number: ${series}" role='presentation' th:classappend="${setSeries eq number ? 'active':''}">
+                <li th:each="number: ${series}" role='presentation'
+                    th:classappend="${setSeries eq number ? 'active':''}">
                     <a class="seriesLink" th:href="@{/garagPage(series=${number})}" th:text="${number}"></a>
                 </li>
             </ul>

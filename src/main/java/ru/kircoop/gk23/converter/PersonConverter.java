@@ -53,6 +53,7 @@ public class PersonConverter {
         pojo.setFatherName(view.getFatherName());
         pojo.setCity(view.getCity());
         pojo.setStreet(view.getStreet());
+        pojo.setHome(view.getHome());
         pojo.setApartment(view.getApartment());
         pojo.setBenefits(view.getBenefits());
         pojo.setTelephone(view.getTelephone());

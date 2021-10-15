@@ -26,16 +26,6 @@
             onlyOne: false,
             position: 'top'
         });
-
-        $(".deleteAssign").popConfirm({
-            title: "Вы хотите удалить назначение к этому гаражу?",
-            content: "",
-            placement: "right",
-            yesBtn: "Да",
-            noBtn: "Нет"
-        });
-
-
     });
 
 </script>
@@ -108,23 +98,6 @@
                     <label for="apartment" class="input-group-addon">Квартира</label>
                     <input type="text" th:field="*{apartment}" id="apartment"
                            class="form-control"/>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-4">
-                    <table class="table">
-                        <tbody>
-                        <tr th:each="garag : ${garags}">
-                            <th><b>Гараж: </b> <p th:text="${garag.fullName}"></p></th>
-                            <td>
-                                <button class="btn btn-danger deleteAssign" th:value="${garag.id}"
-                                        onclick="deleteAssign(this)">
-                                    Удалить назначение
-                                </button>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
                 </div>
             </div>
             <div style="text-align: center" class="col-md-12">

@@ -4,6 +4,7 @@
 
         var type = [[${type}]];
         var garagId = [[${payment.garagId}]];
+        var personId = [[${personId}]];
 
         $("#paymentForm").validate({
             submitHandler: function (form) {
@@ -13,7 +14,7 @@
                     },
                     success: function (id) {
                         if ($("#informationPanel").length !== 0) {
-                            infoGarags( , garagId);
+                            infoGarags(personId, garagId);
                         }
                         $('#formModalPay').modal('hide');
                         window.open('printOrder/' + id, '_blank');

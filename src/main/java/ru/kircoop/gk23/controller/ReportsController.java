@@ -53,6 +53,17 @@ public class ReportsController {
     }
 
     /**
+     * Страница документации
+     *
+     * @param map ModelMap
+     * @return help.html
+     */
+    @GetMapping(value = "help")
+    public String helpPage(Model map) {
+        return "help";
+    }
+
+    /**
      * Отчет - общий список гаражей
      *
      * @param response
