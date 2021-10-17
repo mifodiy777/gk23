@@ -1,29 +1,25 @@
 package ru.kircoop.gk23.service;
 
 
-import com.cooperate.dao.PaymentDAO;
-import com.cooperate.entity.Contribution;
-import com.cooperate.entity.Garag;
-import com.cooperate.entity.Payment;
-
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
-import com.cooperate.entity.Person;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import ru.kircoop.gk23.dao.PaymentDAO;
+import ru.kircoop.gk23.entity.Contribution;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.Payment;
+import ru.kircoop.gk23.entity.Person;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.*;
 
 /**
  * Created by Кирилл on 20.03.2017.
@@ -104,7 +100,7 @@ public class PaymentServiceTest {
     @Test
     public void testDelete() throws Exception {
         paymentService.delete(100);
-        verify(paymentDAO).delete(100);
+        verify(paymentDAO).deleteById(100);
     }
 
     /**
@@ -127,7 +123,7 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayAdding() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
         Payment payment = new Payment();
         payment.setPay(1000);
         Garag garag = new Garag();
@@ -139,12 +135,12 @@ public class PaymentServiceTest {
         given(person.getFIO()).willReturn(fio);
         given(garagService.getGarag(garag.getId())).willReturn(garag);
         given(paymentDAO.getMaxValueNumber()).willReturn(1);
-        given(garagService.sumContribution(garag)).willReturn(100f);
+        given(garagService.sumContribution(garag)).willReturn(100);
 
         paymentService.pay(payment, false, "adding");
 
         assertEquals(payment.getNumber(), Integer.valueOf(2));
-        assertEquals(payment.getYear().intValue(), now.get(Calendar.YEAR));
+        assertEquals(payment.getYear().intValue(), now.getYear());
         assertEquals(payment.getDebtPastPay(), 100f);
         assertEquals(payment.getFio(), fio);
         assertEquals(payment.getAdditionallyPay(), 1000f);
@@ -163,7 +159,7 @@ public class PaymentServiceTest {
      */
     @Test
     public void testOldPayMore() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
         Payment payment = new Payment();
         Contribution contribution = new Contribution();
         payment.setPay(1000);
@@ -185,7 +181,7 @@ public class PaymentServiceTest {
      */
     @Test
     public void testOldPay() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
         Payment payment = new Payment();
         Contribution contribution = new Contribution();
         payment.setPay(800);
@@ -207,15 +203,15 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayMoreDebts() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
         Payment payment = new Payment();
         payment.setPay(3000);
 
         Contribution contribution = new Contribution();
         contribution.setYear(2015);
-        contribution.setContribute(1000f);
-        contribution.setContLand(200f);
-        contribution.setContTarget(1000f);
+        contribution.setContribute(1000);
+        contribution.setContLand(200);
+        contribution.setContTarget(1000);
         contribution.setFines(300);
 
         headerPay(payment, now, contribution, "default");
@@ -246,16 +242,16 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayMoreDebtsPart() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
 
         Payment payment = new Payment();
         payment.setPay(3000);
 
         Contribution contribution = new Contribution();
         contribution.setYear(2015);
-        contribution.setContribute(1000f);
-        contribution.setContLand(200f);
-        contribution.setContTarget(1000f);
+        contribution.setContribute(1000);
+        contribution.setContLand(200);
+        contribution.setContTarget(1000);
         contribution.setFines(1000);
 
         headerPay(payment, now, contribution, "default");
@@ -285,16 +281,16 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayLessDebtsTarget() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
 
         Payment payment = new Payment();
         payment.setPay(2000);
 
         Contribution contribution = new Contribution();
-        contribution.setYear(now.get(Calendar.YEAR));
-        contribution.setContribute(1000f);
-        contribution.setContLand(200f);
-        contribution.setContTarget(1000f);
+        contribution.setYear(now.getYear());
+        contribution.setContribute(1000);
+        contribution.setContLand(200);
+        contribution.setContTarget(1000);
         contribution.setFines(200);
 
         headerPay(payment, now, contribution, "default");
@@ -320,16 +316,16 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayLessDebtsLand() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
 
         Payment payment = new Payment();
         payment.setPay(1100);
 
         Contribution contribution = new Contribution();
-        contribution.setYear(now.get(Calendar.YEAR));
-        contribution.setContribute(1000f);
-        contribution.setContLand(200f);
-        contribution.setContTarget(1000f);
+        contribution.setYear(now.getYear());
+        contribution.setContribute(1000);
+        contribution.setContLand(200);
+        contribution.setContTarget(1000);
         contribution.setFines(200);
 
         headerPay(payment, now, contribution, "default");
@@ -355,16 +351,16 @@ public class PaymentServiceTest {
      */
     @Test
     public void testPayLessDebtsContribute() throws Exception {
-        Calendar now = Calendar.getInstance();
+        LocalDate now = LocalDate.now();
 
         Payment payment = new Payment();
         payment.setPay(800);
 
         Contribution contribution = new Contribution();
-        contribution.setYear(now.get(Calendar.YEAR));
-        contribution.setContribute(1000f);
-        contribution.setContLand(200f);
-        contribution.setContTarget(1000f);
+        contribution.setYear(now.getYear());
+        contribution.setContribute(1000);
+        contribution.setContLand(200);
+        contribution.setContTarget(1000);
         contribution.setFines(200);
 
         headerPay(payment, now, contribution, "default");
@@ -383,7 +379,7 @@ public class PaymentServiceTest {
         assertEquals(payment.getPay(), 0f);
     }
 
-    private void headerPay(Payment payment, Calendar now, Contribution contribution, String type) {
+    private void headerPay(Payment payment, LocalDate now, Contribution contribution, String type) {
         Garag garag = new Garag();
         Person person = mock(Person.class);
         payment.setDatePayment(now);
@@ -394,12 +390,12 @@ public class PaymentServiceTest {
         list.add(contribution);
         garag.setContributions(list);
         if (type.equals("oldPay")) {
-            garag.setOldContribute(800f);
+            garag.setOldContribute(800);
         }
         given(person.getFIO()).willReturn("Иванов Иван Иваныч");
         given(garagService.getGarag(garag.getId())).willReturn(garag);
         given(paymentDAO.getMaxValueNumber()).willReturn(null);
-        given(garagService.sumContribution(garag)).willReturn(100f);
+        given(garagService.sumContribution(garag)).willReturn(100);
 
     }
 }

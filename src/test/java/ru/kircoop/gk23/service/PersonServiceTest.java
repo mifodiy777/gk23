@@ -1,13 +1,12 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.dao.PersonDAO;
-import com.cooperate.entity.Person;
-import com.cooperate.service.PersonService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import ru.kircoop.gk23.dao.PersonDAO;
+import ru.kircoop.gk23.entity.Person;
 
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -36,6 +35,7 @@ public class PersonServiceTest {
 
     /**
      * Сохранение владельца
+     *
      * @throws Exception
      */
     @Test
@@ -47,19 +47,21 @@ public class PersonServiceTest {
 
     /**
      * Удаление владельца
+     *
      * @throws Exception
      */
     @Test
-    public void testDelete() throws Exception {
+    public void testDelete() {
         Integer id = 1;
         service.delete(id);
-        verify(personDAO).delete(id);
+        verify(personDAO).deleteById(id);
     }
 
     /**
      * Получение владельцев по fio
      * case 1: fio пусто - получение 30 любых владельцев
      * case 2: fio заполненно - получение списка владельцев по схожим буквам
+     *
      * @throws Exception
      */
     @Test
@@ -74,6 +76,7 @@ public class PersonServiceTest {
 
     /**
      * Получение списка членов правления
+     *
      * @throws Exception
      */
     @Test
@@ -84,17 +87,19 @@ public class PersonServiceTest {
 
     /**
      * Получение владельца по идентификатору
+     *
      * @throws Exception
      */
     @Test
     public void testGetPerson() throws Exception {
         Integer id = 1;
         service.getPerson(id);
-        verify(personDAO).findOne(id);
+        verify(personDAO).findById(id);
     }
 
     /**
      * Получение списка владельце по части ФИО
+     *
      * @throws Exception
      */
     @Test

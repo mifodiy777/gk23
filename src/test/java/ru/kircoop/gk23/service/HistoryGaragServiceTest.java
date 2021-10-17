@@ -1,14 +1,13 @@
 package ru.kircoop.gk23.service;
 
-import com.cooperate.dao.HistoryGaragDAO;
-import com.cooperate.entity.Garag;
-import com.cooperate.entity.HistoryGarag;
-import com.cooperate.service.HistoryGaragService;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import ru.kircoop.gk23.dao.HistoryGaragDAO;
+import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.HistoryGarag;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -41,6 +40,7 @@ public class HistoryGaragServiceTest {
 
     /**
      * Получение определенной истории по идентификатору
+     *
      * @throws Exception
      */
     @Test
@@ -51,6 +51,7 @@ public class HistoryGaragServiceTest {
 
     /**
      * Сохранении истории
+     *
      * @throws Exception
      */
     @Test
@@ -62,12 +63,13 @@ public class HistoryGaragServiceTest {
 
     /**
      * Удаление истории
+     *
      * @throws Exception
      */
     @Test
     public void testDelete() throws Exception {
         historyGaragService.delete(100);
-        verify(historyGaragDAO).delete(100);
+        verify(historyGaragDAO).deleteById(100);
     }
 
 }
