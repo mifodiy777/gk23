@@ -14,5 +14,4 @@ public class GaragView implements Serializable {
     private PersonView person;
     private String additionalInformation;
     private int oldContribute;
-    private List<HistoryView> historyViewList;
 }

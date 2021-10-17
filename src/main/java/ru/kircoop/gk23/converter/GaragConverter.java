@@ -18,9 +18,6 @@ public class GaragConverter {
     @Autowired
     private PersonConverter converter;
 
-    @Autowired
-    private HistoryConverter historyConverter;
-
     public GaragView map(Garag garag) {
         if (garag == null) return null;
         GaragView dto = new GaragView();
@@ -31,11 +28,6 @@ public class GaragConverter {
         dto.setPerson(converter.map(garag.getPerson()));
         dto.setOldContribute(garag.getOldContribute());
         dto.setAdditionalInformation(garag.getAdditionalInformation());
-        dto.setHistoryViewList(Optional.ofNullable(garag.getHistoryGarags())
-                .orElse(new ArrayList<>())
-                .stream()
-                .map(historyConverter::map)
-                .collect(Collectors.toList()));
         return dto;
     }
 }

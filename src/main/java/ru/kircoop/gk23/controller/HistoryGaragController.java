@@ -7,10 +7,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kircoop.gk23.converter.HistoryConverter;
 import ru.kircoop.gk23.entity.Garag;
+import ru.kircoop.gk23.entity.HistoryGarag;
 import ru.kircoop.gk23.service.GaragService;
 import ru.kircoop.gk23.service.HistoryGaragService;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
@@ -37,7 +39,9 @@ public class HistoryGaragController {
     public String historyModalGarag(@PathVariable("id") Integer id, Model map) {
         Garag garag = garagService.getGarag(id);
         if (garag != null) {
-            map.addAttribute("history", garag.getHistoryGarags().stream().map(historyConverter::map).collect(Collectors.toList()));
+            List<HistoryGarag> historyGaragList = historyGaragService.findByGarag(garag);
+            if (historyGaragList != null)
+                map.addAttribute("history", historyGaragList.stream().map(historyConverter::map).collect(Collectors.toList()));
         }
         return "historyGarag";
     }

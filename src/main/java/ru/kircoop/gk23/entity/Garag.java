@@ -39,11 +39,6 @@ public class Garag implements Serializable {
     @Column(name = "old_contribute", nullable = false)
     private int oldContribute;
 
-    //История изменений      
-    @OneToMany(cascade = CascadeType.ALL)
-    @OrderBy("dateRecord DESC")
-    private List<HistoryGarag> historyGarags;
-
     public Integer getId() {
         return id;
     }
@@ -99,14 +94,6 @@ public class Garag implements Serializable {
 
     public void setAdditionalInformation(String additionalInformation) {
         this.additionalInformation = additionalInformation;
-    }
-
-    public List<HistoryGarag> getHistoryGarags() {
-        return historyGarags;
-    }
-
-    public void setHistoryGarags(List<HistoryGarag> historyGarags) {
-        this.historyGarags = historyGarags;
     }
 
     public String getName() {

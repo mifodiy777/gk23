@@ -1,7 +1,5 @@
 package ru.kircoop.gk23.exception;
 
-import java.util.function.Supplier;
-
 /**
  * Техническая ошибка
  */

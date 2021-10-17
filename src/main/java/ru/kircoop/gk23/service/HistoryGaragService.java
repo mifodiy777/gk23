@@ -8,6 +8,7 @@ import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.entity.HistoryGarag;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class HistoryGaragService {
@@ -23,6 +24,15 @@ public class HistoryGaragService {
      */
     public HistoryGarag getHistoryGarag(Integer id) {
         return historyGaragDAO.getById(id);
+    }
+
+    /**
+     * Список записей по смене владельца определенного гаража
+     * @param garag
+     * @return
+     */
+    public List<HistoryGarag> findByGarag(Garag garag){
+        return historyGaragDAO.findByGarag(garag);
     }
 
     /**

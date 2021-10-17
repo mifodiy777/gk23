@@ -22,6 +22,10 @@ public class HistoryGarag implements Serializable {
     @Column(name = "reason")
     private String reason;
 
+    @ManyToOne
+    @JoinColumn(name = "id_garag")
+    private Garag garag;
+
     public HistoryGarag() {
     }
 
@@ -29,6 +33,7 @@ public class HistoryGarag implements Serializable {
         this.dateRecord = dateRecord;
         this.fioLastPerson = fioLastPerson;
         this.reason = reason;
+        this.garag = garag;
     }
 
     public Integer getId() {
@@ -61,6 +66,14 @@ public class HistoryGarag implements Serializable {
 
     public void setReason(String reason) {
         this.reason = reason;
+    }
+
+    public Garag getGarag() {
+        return garag;
+    }
+
+    public void setGarag(Garag garag) {
+        this.garag = garag;
     }
 
     @Override

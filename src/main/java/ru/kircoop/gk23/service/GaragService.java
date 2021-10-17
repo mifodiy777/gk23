@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kircoop.gk23.dao.GaragDAO;
+import ru.kircoop.gk23.dao.HistoryGaragDAO;
 import ru.kircoop.gk23.dao.Impl.CustomDAOImpl;
 import ru.kircoop.gk23.entity.Garag;
 import ru.kircoop.gk23.entity.Person;
@@ -30,6 +31,9 @@ public class GaragService {
     @Autowired
     private PersonService personService;
 
+    @Autowired
+    private HistoryGaragDAO historyGaragDAO;
+
     /**
      * Метод добавления и редактирования гаражей в базе
      *
@@ -50,7 +54,6 @@ public class GaragService {
             //Если гараж уже есть в базе, не трогаем Историю, Платежи, Периоды.
             Garag garagEdit = garagDAO.findById(garag.getId()).orElseThrow(() -> new ServiceException("Не найден гараж для изменения"));
             garag.setContributions(garagEdit.getContributions());
-            garag.setHistoryGarags(garagEdit.getHistoryGarags());
         }
         return garagDAO.save(garag);
     }
@@ -73,7 +76,9 @@ public class GaragService {
      */
     @Transactional
     public void delete(Integer id) {
-        garagDAO.deleteById(id);
+        Garag garag = garagDAO.getById(id);
+        historyGaragDAO.deleteByGarag(garag);
+        garagDAO.delete(garag);
     }
 
     /**
