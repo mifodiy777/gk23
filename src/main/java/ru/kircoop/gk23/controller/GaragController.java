@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.kircoop.gk23.comparator.SeriesComparator;
 import ru.kircoop.gk23.converter.*;
 import ru.kircoop.gk23.dto.*;
 import ru.kircoop.gk23.entity.Contribution;
@@ -96,7 +97,7 @@ public class GaragController {
     public String getGaragsPage(@RequestParam(defaultValue = "1", value = "series") String series, Model model) {
         model.addAttribute("setSeries", series); //ряд, по умолчанию выбирается ряд "1"
         try {
-            model.addAttribute("series", garagService.getSeries()); //список рядов для nav-tabs
+            model.addAttribute("series", garagService.getSeries().stream().sorted(new SeriesComparator()).collect(Collectors.toList())); //список рядов для nav-tabs
             return "garags";
         } catch (DataAccessException e) {
             model.addAttribute("textError", "Ошибка базы данных, проверте подключение к БД");

@@ -85,7 +85,6 @@ function loadOwner(pattern) {
                     $("#name").val(person.name);
                     $("#fatherName").val(person.fatherName);
                     $("#telephone").val(person.telephone);
-                    $("#addressId").val(person.id);
                     $("#city").val(person.city);
                     $("#street").val(person.street);
                     $("#home").val(person.home);

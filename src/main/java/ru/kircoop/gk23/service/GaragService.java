@@ -40,19 +40,19 @@ public class GaragService {
     public Garag saveOrUpdate(Garag garag) throws ServiceException {
         //Гараж новый и владелец новый
         if (garag.getId() == null) {
-            return garagDAO.save(garag);
+            if (garag.getPerson() != null && garag.getPerson().getId() != null) {
+                Person p = garag.getPerson();
+                garag.setPerson(null);
+                garag = garagDAO.save(garag);
+                garag.setPerson(p);
+            }
         } else {
             //Если гараж уже есть в базе, не трогаем Историю, Платежи, Периоды.
             Garag garagEdit = garagDAO.findById(garag.getId()).orElseThrow(() -> new ServiceException("Не найден гараж для изменения"));
             garag.setContributions(garagEdit.getContributions());
             garag.setHistoryGarags(garagEdit.getHistoryGarags());
         }
-        //Во всех остальных случиях просто сохраняем гараж.
         return garagDAO.save(garag);
-    }
-
-    public List<Garag> getGaragOnPerson() {
-        return null;
     }
 
     /**
@@ -140,11 +140,6 @@ public class GaragService {
         if (!searchPerson && !deletePerson) {
             //Очищаем id владельца
             person.setId(null);
-            //Очищаем адрес
-            person.setCity(null);
-            person.setStreet(null);
-            person.setApartment(null);
-            person.setHome(null);
         }
         //Если гараж у данного владельца не один, владельца необходимо удалить, поиск
         if (!oneGarag && deletePerson && !searchPerson) {

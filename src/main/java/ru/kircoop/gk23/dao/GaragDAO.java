@@ -28,7 +28,7 @@ public interface GaragDAO extends JpaRepository<Garag, Integer> {
      *
      * @return список рядов
      */
-    @Query("select distinct g.series from Garag g order by g.series ASC")
+    @Query("select distinct g.series from Garag g")
     List<String> getSeries();
 
     /**
