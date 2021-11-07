@@ -42,7 +42,7 @@ public class PersonServiceTest {
     public void testSaveOrUpdate() throws Exception {
         Person person = new Person();
         service.saveOrUpdate(person);
-        verify(personDAO).save(person);
+        verify(personDAO).saveAndFlush(person);
     }
 
     /**

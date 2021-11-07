@@ -54,7 +54,7 @@ public class RentServiceTest {
     public void testSaveOrUpdate() throws Exception {
         Rent rent = new Rent();
         service.saveOrUpdate(rent);
-        verify(rentDAO).save(rent);
+        verify(rentDAO).saveAndFlush(rent);
     }
 
     /**
@@ -163,19 +163,21 @@ public class RentServiceTest {
         paymentList.add(payment);
         given(garagService.getGarags()).willReturn(garagList);
         given(paymentService.getPaymentOnGarag(garag)).willReturn(paymentList);
+
         service.createNewPeriod(rent);
+
         assertEquals(garag.getContributions().size(), 2);
         for (Contribution contribution : garag.getContributions()) {
             if (contribution.getYear() == 2017) {
                 assertEquals(contribution.getYear(), Integer.valueOf(2017));
-                assertEquals(contribution.getContribute(), 0f);
-                assertEquals(contribution.getContLand(), 100f);
-                assertEquals(contribution.getContTarget(), 1000f);
+                assertEquals(contribution.getContribute(), 0);
+                assertEquals(contribution.getContLand(), 100);
+                assertEquals(contribution.getContTarget(), 1000);
                 assertTrue(contribution.isMemberBoardOn());
                 assertTrue(contribution.isBenefitsOn());
             }
         }
-        verify(garagService).save(garag);
+//        verify(garagService).save(garag);
     }
 
 }

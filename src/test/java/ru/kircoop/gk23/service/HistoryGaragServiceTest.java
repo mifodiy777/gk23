@@ -46,7 +46,7 @@ public class HistoryGaragServiceTest {
     @Test
     public void testGetHistoryGarag() throws Exception {
         historyGaragService.getHistoryGarag(100);
-        verify(historyGaragDAO).getOne(100);
+        verify(historyGaragDAO).getById(100);
     }
 
     /**

@@ -29,7 +29,7 @@ import static org.testng.AssertJUnit.*;
 public class ContributionServiceTest {
 
     @InjectMocks
-    private ContributionService contributionService = new ContributionService();
+    private ContributionService contributionService;
 
     @Mock
     private ContributionDAO contributionDAO;
@@ -217,13 +217,13 @@ public class ContributionServiceTest {
         List<Contribution> list = new ArrayList<>();
         list.add(contribution);
 
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(list);
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(new ArrayList<>());
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(list);
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(new ArrayList<>());
 
         contributionService.onFines(now);
 
         assertTrue(contribution.isFinesOn());
-        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().get(Calendar.YEAR));
+        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().getYear());
         verify(contributionDAO).save(contribution);
     }
 
@@ -243,7 +243,7 @@ public class ContributionServiceTest {
         List<Contribution> list = new ArrayList<>();
         list.add(contribution);
 
-        Calendar now = new GregorianCalendar(2017, 10, 1);
+        Calendar now = new GregorianCalendar(2017, Calendar.NOVEMBER, 1);
 
         Rent rent = new Rent();
         rent.setYearRent(now.get(Calendar.YEAR));
@@ -252,14 +252,14 @@ public class ContributionServiceTest {
 
 
         given(rentDAO.findByYearRent(now.get(Calendar.YEAR))).willReturn(rent);
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
 
         contributionService.onFines(now);
 
         assertTrue(contribution.isFinesOn());
-        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().get(Calendar.YEAR));
-        assertEquals(6, contribution.getFinesLastUpdate().get(Calendar.MONTH));
+        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().getYear());
+        assertEquals(7, contribution.getFinesLastUpdate().getMonthValue());
         verify(contributionDAO).save(contribution);
     }
 
@@ -287,14 +287,14 @@ public class ContributionServiceTest {
 
 
         given(rentDAO.findByYearRent(now.get(Calendar.YEAR))).willReturn(rent);
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
 
         contributionService.onFines(now);
 
         assertTrue(contribution.isFinesOn());
-        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().get(Calendar.YEAR));
-        assertEquals(6, contribution.getFinesLastUpdate().get(Calendar.MONTH));
+        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().getYear());
+        assertEquals(7, contribution.getFinesLastUpdate().getMonthValue());
         verify(contributionDAO).save(contribution);
     }
 
@@ -322,14 +322,14 @@ public class ContributionServiceTest {
 
 
         given(rentDAO.findByYearRent(now.get(Calendar.YEAR))).willReturn(rent);
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
 
         contributionService.onFines(now);
 
         assertTrue(contribution.isFinesOn());
-        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().get(Calendar.YEAR));
-        assertEquals(6, contribution.getFinesLastUpdate().get(Calendar.MONTH));
+        assertEquals(now.get(Calendar.YEAR), contribution.getFinesLastUpdate().getYear());
+        assertEquals(7, contribution.getFinesLastUpdate().getMonthValue());
         verify(contributionDAO).save(contribution);
     }
 
@@ -343,8 +343,8 @@ public class ContributionServiceTest {
         Calendar now = Calendar.getInstance();
 
         Contribution contribution = new Contribution();
-        contribution.setContribute(0f);
-        contribution.setContLand(200f);
+        contribution.setContribute(0);
+        contribution.setContLand(200);
         contribution.setFinesOn(false);
         List<Contribution> list = new ArrayList<>();
         list.add(contribution);
@@ -356,8 +356,8 @@ public class ContributionServiceTest {
 
 
         given(rentDAO.findByYearRent(now.get(Calendar.YEAR))).willReturn(rent);
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
-        given(customDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR) - 1)).willReturn(new ArrayList<>());
+        given(contributionDAO.findContributionsByFines(now.get(Calendar.YEAR))).willReturn(list);
 
         contributionService.onFines(now);
 
