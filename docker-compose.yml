@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
   # APP*****************************************
   springbootapp:
-    image: mifody777/cooperate-app:latest
+    image: cooperate-app:latest
     container_name: springbootapp
     ports:
       - 8081:8081
