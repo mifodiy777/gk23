@@ -30,6 +30,9 @@ public class Gk23Application extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        String[] resources = new String[]{
+                "/css/**", "/fonts/**", "/images/**", "/js/**"
+        };
         http.csrf().disable()
                 .cors().disable()
                 .httpBasic().disable()
@@ -37,10 +40,10 @@ public class Gk23Application extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginPage("/login")
                 .permitAll()
-                .defaultSuccessUrl("/index.html")
+                .defaultSuccessUrl("/start", true)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/static/**").permitAll()
+                .antMatchers(resources).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()

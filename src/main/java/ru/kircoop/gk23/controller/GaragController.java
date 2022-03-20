@@ -67,6 +67,11 @@ public class GaragController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GaragController.class);
 
+    @GetMapping(value = "/start")
+    public String toStartPage() {
+        return "index";
+    }
+
     /*
      * Получение списка гаражей
      *
